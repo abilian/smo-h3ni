@@ -5,7 +5,7 @@ import subprocess
 
 import yaml
 from flask import Flask
-from flasgger import APISpec, Swagger
+from flasgger import Swagger
 
 from config import configs
 from errors import error_handlers

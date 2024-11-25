@@ -11,7 +11,7 @@ from services.graph_service import deploy_graph, fetch_graph, \
 graph = Blueprint('graph', __name__)
 
 
-@graph.route('/graph/project/<project>', methods=['GET'])
+@graph.route('/project/<project>/graphs', methods=['GET'])
 @swag_from('swagger/get_all_graphs.yaml')
 def get_all_graphs(project):
     """Fetches all graphs under a project."""
@@ -19,7 +19,7 @@ def get_all_graphs(project):
     return fetch_project_graphs(project), 200
 
 
-@graph.route('/graph/project/<project>', methods=['POST'])
+@graph.route('/project/<project>/graphs', methods=['POST'])
 @swag_from('swagger/deploy.yaml')
 def deploy(project):
     """
@@ -40,7 +40,7 @@ def deploy(project):
     return 'Graph deployment successful\n', 200
 
 
-@graph.route('/graph/<name>', methods=['GET'])
+@graph.route('/graphs/<name>', methods=['GET'])
 @swag_from('swagger/get_graph.yaml')
 def get_graph(name):
     """Retrieves an application graph descriptor."""
@@ -53,7 +53,7 @@ def get_graph(name):
         return f'Graph with name {name} not found\n', 404
 
 
-@graph.route('/graph/<name>/placement', methods=['GET'])
+@graph.route('/graphs/<name>/placement', methods=['GET'])
 @swag_from('swagger/placement.yaml')
 def placement(name):
     """Runs the placement algorithm on the graph."""
@@ -63,7 +63,7 @@ def placement(name):
     return f'Placement of graph {name} triggered\n', 200
 
 
-@graph.route('/graph/<name>/start', methods=['GET'])
+@graph.route('/graphs/<name>/start', methods=['GET'])
 @swag_from('swagger/start.yaml')
 def start(name):
     """Starts a stopped graph."""
@@ -73,7 +73,7 @@ def start(name):
     return 'Graph stopped\n', 200
 
 
-@graph.route('/graph/<name>/stop', methods=['GET'])
+@graph.route('/graphs/<name>/stop', methods=['GET'])
 @swag_from('swagger/stop.yaml')
 def stop(name):
     """Uninstalls graphs artifacts without erasing from the database."""
@@ -83,7 +83,7 @@ def stop(name):
     return 'Graph stopped\n', 200
 
 
-@graph.route('/graph/<name>', methods=['DELETE'])
+@graph.route('/graphs/<name>', methods=['DELETE'])
 @swag_from('swagger/remove.yaml')
 def remove(name):
     """Handles the graph removal."""

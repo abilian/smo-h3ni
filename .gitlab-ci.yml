@@ -6,7 +6,7 @@ smo:
   stage: build
   image: python
 
-  variables:  
+  variables:
     POSTGRESQL_DATABASE: smo
     POSTGRESQL_USER: root
     POSTGRESQL_PASSWORD: password
@@ -14,10 +14,10 @@ smo:
   services:
     - name: quay.io/sclorg/postgresql-15-c9s
       alias: postgres
-      
+
   script:
     - export PGPASSWORD=$POSTGRESQL_PASSWORD
-    - sleep 4  
+    - sleep 4
     - pip install -r requirements.txt
     - cd src
     - python app.py &> flask.log &

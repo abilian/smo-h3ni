@@ -4,8 +4,8 @@ This repository hosts the Synergetic Meta-Orchestrator consisting of a Flask RES
 
 ## Getting started
 Use docker compose:
-```
-docker-compose up
+```bash
+docker compose up
 ```
 The SMO API is available at port 8000.
 

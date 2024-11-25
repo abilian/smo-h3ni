@@ -1,6 +1,9 @@
 FROM python:3.11
 
 RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+RUN wget https://gitlab.eclipse.org/eclipse-research-labs/nephele-project/nephele-development-sandbox/-/raw/main/tools/hdarctl
+RUN chmod +x hdarctl
+RUN mv hdarctl /bin/
 
 WORKDIR /app
 
@@ -16,7 +19,5 @@ ENV FLASK_RUN_PORT=8000
 EXPOSE 8000
 
 COPY src/ .
-
-COPY hdarctl /bin/
 
 CMD ["flask", "run", "--host", "0.0.0.0", "--debug"]

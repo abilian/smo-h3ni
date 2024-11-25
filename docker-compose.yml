@@ -2,6 +2,8 @@ services:
   smo:
     container_name: smo
     build: .
+    env_file:
+    - config/flask.env
     volumes:
       - type: bind
         source: ~/.kube/
@@ -22,7 +24,7 @@ services:
     container_name: postgres
     image: postgres:16.2
     env_file:
-    - .db.env
+    - config/postgres.env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -t 1"]
       interval: 3s
