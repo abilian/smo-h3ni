@@ -1,0 +1,7 @@
+summary: Fetch all Openstack Kubernetes clusters
+description: Retrieves a list of all Openstack Kubernetes clusters.
+tags:
+  - Openstack Kubernetes
+responses:
+  200:
+    description: A list of all clusters.

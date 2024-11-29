@@ -1,0 +1,72 @@
+summary: Create SMO VIM
+description: Creates a new SMO VIM with the specified details and stores it in the database.
+tags:
+  - VIM
+parameters:
+  - name: body
+    in: body
+    description: Details required to create a new SMO VIM.
+    required: True
+    schema:
+      type: object
+      properties:
+        topology:
+          type: string
+          description: The name of the topology associated with the VIM.
+        pop_area:
+          type: integer
+          description: The POP area where the VIM will be located.
+        vim_name:
+          type: string
+          description: The name of the VIM.
+        vim_tenant_name:
+          type: string
+          description: The tenant name for the VIM.
+        vim_user:
+          type: string
+          description: The username for VIM authentication.
+        vim_password:
+          type: string
+          description: The password for VIM authentication.
+        vim_url:
+          type: string
+          description: The URL of the VIM.
+        vim_type:
+          type: string
+          description: The type of the VIM.
+        mgmt_network:
+          type: object
+          description: Details of the management network.
+          properties:
+            cidr:
+              type: string
+              description: The CIDR block of the management network.
+            name:
+              type: string
+              description: The name of the management network.
+            gateway:
+              type: string
+              description: The gateway IP of the management network.
+        service_network:
+          type: object
+          description: Details of the service network.
+          properties:
+            cidr:
+              type: string
+              description: The CIDR block of the service network.
+            name:
+              type: string
+              description: The name of the service network.
+            gateway:
+              type: string
+              description: The gateway IP of the service network.
+        use_floating_ip:
+          type: boolean
+          description: Whether the VIM should use floating IPs.
+responses:
+  201:
+    description: SMO VIM created successfully.
+  400:
+    description: Bad request. Invalid or missing data.
+  500:
+    description: Internal server error.

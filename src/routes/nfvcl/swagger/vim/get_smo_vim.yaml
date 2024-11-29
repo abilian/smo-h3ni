@@ -1,0 +1,16 @@
+summary: Fetch SMO VIM
+description: Fetches details of a specific SMO VIM by its ID.
+tags:
+  - VIM
+parameters:
+  - name: smo_id
+    in: path
+    description: Unique identifier of the SMO VIM.
+    required: True
+    type: string
+responses:
+  200:
+    description: Details of the requested SMO VIM.
+  404:
+    description: VIM with SMO ID {smo_id} not found
+

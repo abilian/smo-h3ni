@@ -1,0 +1,16 @@
+summary: Delete SMO VIM
+description: Deletes a specific SMO VIM by its ID.
+tags:
+  - VIM
+parameters:
+  - name: smo_id
+    in: path
+    description: Unique identifier of the SMO VIM to delete.
+    required: True
+    type: string
+responses:
+  200:
+    description: Confirmation of deletion.
+  404:
+    description: SMO VIM not found.
+

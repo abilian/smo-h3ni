@@ -18,6 +18,7 @@ class Config:
     KARMADA_KUBECONFIG = '/home/python/.kube/{}'.format(
         os.getenv('KARMADA_KUBECONFIG', 'karmada-apiserver.config')
     )
+    NFVCL_BASE_URL = os.getenv('NFVCL_BASE_URL')
 
 
 class ProdConfig(Config):

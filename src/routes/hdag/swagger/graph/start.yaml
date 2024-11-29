@@ -1,5 +1,7 @@
 summary: Start graph
 description: Start a stopped graph
+tags:
+  - Graph
 parameters:
   - name: name
     in: path

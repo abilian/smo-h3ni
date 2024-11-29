@@ -1,4 +1,4 @@
-"""Application graph table."""
+"""Application graph."""
 
 from models import db
 from sqlalchemy.dialects.postgresql import JSONB

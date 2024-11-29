@@ -1,0 +1,15 @@
+summary: Sync Openstack Kubernetes clusters from NFVCL
+description: Synchronizes Openstack Kubernetes cluster data with the NFVCL instance. Adds new clusters, updates existing ones, and deletes stale entries based on the provided POP area.
+tags:
+  - Openstack Kubernetes
+parameters:
+  - name: pop_area
+    in: query
+    description: The POP area to filter the synchronization data.
+    required: False
+    type: integer
+responses:
+  200:
+    description: Synchronization result with details of added, updated, or deleted clusters.
+  500:
+    description: Internal server error.
