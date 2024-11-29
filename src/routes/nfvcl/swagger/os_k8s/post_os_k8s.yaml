@@ -1,0 +1,23 @@
+summary: Create Openstack Kubernetes cluster
+description: Creates a new Openstack Kubernetes cluster.
+tags:
+  - Openstack Kubernetes
+parameters:
+  - name: body
+    in: body
+    description: The details of the cluster to be created.
+    required: True
+    schema:
+      type: object
+      properties:
+        pop_area:
+          type: integer
+          description: Area id.
+        vim_name:
+          type: string
+          description: VIM name.
+responses:
+  201:
+    description: Confirmation of creation.
+
+

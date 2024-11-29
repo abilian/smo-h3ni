@@ -1,5 +1,7 @@
 summary: Get project graphs
 description: Fetch all graphs under a project
+tags:
+  - Graph
 parameters:
   - name: project
     in: path

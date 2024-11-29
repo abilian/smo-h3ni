@@ -1,0 +1,17 @@
+summary: Delete a specific Openstack Kubernetes cluster
+description: Deletes the Openstack Kubernetes cluster with the specified ID.
+tags:
+  - Openstack Kubernetes
+parameters:
+  - name: smo_id
+    in: path
+    description: The unique identifier of the cluster to be deleted.
+    required: True
+    type: string
+responses:
+  200:
+    description: Confirmation of deletion.
+  404:
+    description: Cluster not found.
+  500:
+    description: Failed to delete blueprint in NFVCL API.

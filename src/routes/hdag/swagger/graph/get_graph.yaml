@@ -1,5 +1,7 @@
 summary: Get graph
 description: Fetch a specific graph
+tags:
+  - Graph
 parameters:
   - name: name
     in: path

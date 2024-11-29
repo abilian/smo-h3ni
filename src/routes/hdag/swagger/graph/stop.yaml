@@ -1,5 +1,7 @@
 summary: Stop graph
 description: Stop a running graph
+tags:
+  - Graph
 parameters:
   - name: name
     in: path

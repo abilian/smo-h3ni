@@ -10,15 +10,16 @@ from flasgger import Swagger
 from config import configs
 from errors import error_handlers
 from models import db
-from routes.graph import graph
+from routes.hdag.graph import graph
+from routes.nfvcl.bm_k8s import bm_k8s
+from routes.nfvcl.os_k8s import os_k8s
+from routes.nfvcl.vim import vim
 
 env = os.environ.get('FLASK_ENV', 'development')
 
 
 def create_app(app_name='smo'):
-    """
-    Function that returns a configured Flask app.
-    """
+    """Function that returns a configured Flask app."""
 
     ROOT_PATH = os.path.dirname(__file__)
     app = Flask(app_name, root_path=ROOT_PATH)
@@ -26,12 +27,38 @@ def create_app(app_name='smo'):
     app.config['SWAGGER'] = {
         'title': 'SMO-API',
         'uiversion': 3,
+        'specs_route': '/docs/',
+        'specs': [
+            {
+                'endpoint': 'smo-api-spec',
+                'route': '/smo-api-spec.json',
+                'rule_filter': lambda rule: True,  # all in
+                'model_filter': lambda tag: True,  # all in
+            }
+        ],
+        'ui_params': {
+            'apisSorter': 'alpha',
+            'operationsSorter': 'alpha',
+            'tagsSorter': 'alpha'
+        },
+        'ui_params_text': (
+            '{\n'
+            '    "operationsSorter": (a, b) => {\n'
+            '        var order = { "get": "0", "post": "1", "put": "2", "delete": "3" };\n'
+            '        return order[a.get("method")].localeCompare(order[b.get("method")]);\n'
+            '    }\n'
+            '}'
+        )
     }
-    Swagger(app)
+    Swagger(app=app)
 
     app.config.from_object(configs[env])
 
     app.register_blueprint(graph)
+    app.register_blueprint(bm_k8s)
+    app.register_blueprint(os_k8s)
+    app.register_blueprint(vim)
+
 
     app.register_error_handler(
         subprocess.CalledProcessError,

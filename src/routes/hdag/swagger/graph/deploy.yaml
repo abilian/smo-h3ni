@@ -1,5 +1,7 @@
 summary: Deploy descriptor
 description: Deploy a graph descriptor
+tags:
+  - Graph
 parameters:
   - name: project
     in: path

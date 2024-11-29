@@ -1,0 +1,17 @@
+summary: Scale out Openstack Kubernetes cluster
+description: Scales out the Openstack Kubernetes cluster with the specified ID.
+tags:
+  - Openstack Kubernetes
+parameters:
+  - name: smo_id
+    in: path
+    description: The unique identifier of the cluster to be scaled out.
+    required: True
+    type: string
+responses:
+  200:
+    description: Confirmation of the scale-out operation.
+  404:
+    description: OS K8S cluster not found.
+  500:
+    description: Internal server error.

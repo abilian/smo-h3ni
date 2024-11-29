@@ -1,0 +1,7 @@
+summary: Sync VIMs from NFVCL
+description: Synchronizes all VIMs from the NFVCL instance.
+tags:
+  - VIM
+responses:
+  200:
+    description: A list of VIMs synchronized from the NFVCL instance.

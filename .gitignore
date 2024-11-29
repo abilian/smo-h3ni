@@ -167,3 +167,5 @@ poetry.toml
 pyrightconfig.json
 
 hdarctl
+
+.vscode/

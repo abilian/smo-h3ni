@@ -1,0 +1,16 @@
+summary: Fetch a specific Openstack Kubernetes cluster
+description: Retrieves details of the Openstack Kubernetes cluster with the given ID.
+tags:
+  - Openstack Kubernetes
+parameters:
+  - name: smo_id
+    in: path
+    description: The unique identifier of the cluster.
+    required: True
+    type: string
+responses:
+  200:
+    description: Details of the requested cluster.
+  404:
+    description: OS_K8S cluster not found.
+

@@ -1,0 +1,14 @@
+summary: Fetch all SMO VIMs
+description: Fetches all SMO VIMs, optionally filtered by a specific POP area.
+tags:
+  - VIM
+parameters:
+  - name: pop_area
+    in: query
+    description: Filter by point-of-presence (POP) area.
+    required: False
+    type: string
+responses:
+  200:
+    description: A list of all SMO VIMs.
+
