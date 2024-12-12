@@ -127,7 +127,7 @@ def decide_replicas(
         model.addConstr(acceleration[s] <= cluster_acceleration, name=f"constraint_acceleration_{s}")
         model.addConstr(alpha[s] * r_current[s] + beta[s] >= request_rates[s], name=f"constraint_service_rate_{s}")
         model.addConstr(1 <= r_current[s], name=f"lower_bound_replicas{s}")
-        model.addConstr(r_current[s] <= maximum_replicas[s], name=f"upper_bound_replicas_{s}")
+        # model.addConstr(r_current[s] <= maximum_replicas[s], name=f"upper_bound_replicas_{s}")
 
     # Solve the model
     model.optimize()

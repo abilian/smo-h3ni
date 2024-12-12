@@ -1,5 +1,6 @@
 """Application graph deployment business logic."""
 
+import re
 import subprocess
 import tempfile
 import threading
@@ -10,6 +11,7 @@ from flask import current_app
 from werkzeug.exceptions import BadRequest, NotFound
 
 from utils.kube_helper import KubeHelper
+from utils.prometheus_helper import PrometheusHelper
 from models import db, Graph, Service
 from utils.placement import convert_placement, decide_placement, swap_placement
 from utils.scaling import scaling_loop
@@ -73,6 +75,7 @@ def deploy_graph(project, graph_descriptor):
     import_clusters = create_service_imports(services, service_placement)
 
     for service in services:
+        alert = {}
         name = service['id']
         artifact = service['artifact']
         artifact_ref = artifact['ociImage']
@@ -80,6 +83,24 @@ def deploy_graph(project, graph_descriptor):
         artifact_type = artifact['ociConfig']['type']
         values_overwrite = artifact['valuesOverwrite']
         placement_dict = values_overwrite
+
+        conditional_deployment = False
+        deployment_trigger = service['deployment']['trigger']
+        if 'event' in deployment_trigger:
+            conditional_deployment = True
+            deployment_condition = deployment_trigger['event']['condition']
+            events = deployment_trigger['event']['events']
+            for event in events:
+                sources = event['source']
+                event_id = event['id']
+                event_condition = event['condition']
+                prom_query = event_condition['promQuery']
+                grace_period = event_condition['gracePeriod']
+                description = event_condition['description']
+
+                prom_helper = PrometheusHelper(PROMETHEUS_HOST)
+                alert = create_alert(event_id, prom_query, grace_period, description, name)
+                prom_helper.update_alert_rules(alert, 'add')
 
         if implementer == 'WOT':
             if 'voChartOverwrite' not in values_overwrite:
@@ -89,22 +110,26 @@ def deploy_graph(project, graph_descriptor):
         placement_dict['clustersAffinity'] = [service_placement[name]]
         placement_dict['serviceImportClusters'] = import_clusters[name]
 
+        status = 'Pending' if conditional_deployment else 'Deployed'
+
         svc = Service(
             name=name,
             values_overwrite=values_overwrite,
             graph_id=graph.id,
-            status='Deployed',
+            status=status,
             cluster_affinity=service_placement[name],
             artifact_ref=artifact_ref,
             artifact_type=artifact_type,
             artifact_implementer=implementer,
             resources=RESOURCES[name],
-            grafana=SERVICES_GRAFANA[name]
+            grafana=SERVICES_GRAFANA[name],
+            alert=alert
         )
         db.session.add(svc)
         db.session.commit()
 
-        helm_install_artifact(name, artifact_ref, values_overwrite, 'install')
+        if not conditional_deployment:
+            helm_install_artifact(name, artifact_ref, values_overwrite, 'install')
 
     spawn_scaling_processes(graph.name, cluster_placement)
 
@@ -170,13 +195,16 @@ def start_graph(name):
         raise BadRequest(f'Graph with name {name} is already running')
     graph.status = 'Running'
     for service in graph.services:
-        helm_install_artifact(
-            service.name,
-            service.artifact_ref,
-            service.values_overwrite,
-            'install'
-        )
-        service.status = 'Deployed'
+        if service.alert != {}:
+            prom_helper = PrometheusHelper(PROMETHEUS_HOST)
+            prom_helper.update_alert_rules(service.alert, 'add')
+        if service.status == 'Deployed':
+            helm_install_artifact(
+                service.name,
+                service.artifact_ref,
+                service.values_overwrite,
+                'install'
+            )
     db.session.commit()
 
 
@@ -192,8 +220,6 @@ def stop_graph(name):
     helm_uninstall_graph(graph.services)
 
     graph.status = 'Stopped'
-    for service in graph.services:
-        service.status = 'Not deployed'
     db.session.commit()
 
 
@@ -208,6 +234,25 @@ def remove_graph(name):
 
     db.session.delete(graph)
     db.session.commit()
+
+
+def deploy_conditional_service(data):
+    """Deploys a service that is triggered when an alert has been fired."""
+
+    alerts = data['alerts']
+    for alert in alerts:
+        labels = alert['labels']
+        if 'service' in labels:
+            alertname = labels['alertname']
+            service_name = labels['service']
+            service = db.session.query(Service).filter_by(name=service_name).first()
+            if service is None:
+                continue
+
+            helm_install_artifact(service.name, service.artifact_ref, service.values_overwrite, 'install')
+
+            service.status = 'Deployed'
+            db.session.commit()
 
 
 def create_service_imports(services, service_placement):
@@ -283,13 +328,17 @@ def helm_uninstall_graph(services):
     """Uninstalls all service artifacts."""
 
     for service in services:
-        subprocess.run([
-            'helm',
-            'uninstall',
-            service.name,
-            '--kubeconfig',
-            current_app.config['KARMADA_KUBECONFIG']
-        ])
+        if service.alert != {}:
+            prom_helper = PrometheusHelper(PROMETHEUS_HOST)
+            prom_helper.update_alert_rules(service.alert, 'remove')
+        if service.status == 'Deployed':
+            subprocess.run([
+                'helm',
+                'uninstall',
+                service.name,
+                '--kubeconfig',
+                current_app.config['KARMADA_KUBECONFIG']
+            ])
     for stop_event in stop_events:
         stop_event.set()
 
@@ -327,3 +376,19 @@ def spawn_scaling_processes(graph_name, cluster_placement):
         )
         background_scaling_threads[cluster_index].daemon = True
         background_scaling_threads[cluster_index].start()
+
+
+def create_alert(event_id, prom_query, grace_period, description, name):
+    return {
+        'alert': f'{event_id}',
+        'annotations': {
+            'description': description,
+            'summary': description
+        },
+        'expr': f'{prom_query}',
+        'for': f'{grace_period}',
+        'labels': {
+            'severity': 'critical',
+            'service': name
+        }
+    }
