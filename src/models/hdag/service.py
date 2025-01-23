@@ -15,7 +15,10 @@ class Service(db.Model):
     artifact_ref = db.Column(db.String(255))
     artifact_type = db.Column(db.String(255))
     artifact_implementer = db.Column(db.String(255))
-    resources = db.Column(JSONB)
+    cpu = db.Column(db.String(255))
+    memory = db.Column(db.String(255))
+    storage = db.Column(db.String(255))
+    gpu = db.Column(db.String(255))
     values_overwrite = db.Column(JSONB)
     alert = db.Column(JSONB)
 
@@ -34,7 +37,10 @@ class Service(db.Model):
             'status': self.status,
             'grafana': self.grafana,
             'cluster_affinity': self.cluster_affinity,
-            'resources': self.resources,
+            'cpu': self.cpu,
+            'memory': self.memory,
+            'storage': self.storage,
+            'gpu': self.gpu,
             'values_overwrite': self.values_overwrite,
             'artifact_ref': self.artifact_ref,
             'artifact_type': self.artifact_type,

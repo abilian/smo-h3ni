@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def str_to_bool(str_variable):
+    return str_variable.lower() in ('t', 'true')
+
 class Config:
     """Database connection credentials."""
     SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:5432/{}'.format(
@@ -19,6 +22,13 @@ class Config:
         os.getenv('KARMADA_KUBECONFIG', 'karmada-apiserver.config')
     )
     NFVCL_BASE_URL = os.getenv('NFVCL_BASE_URL')
+    INSECURE_REGISTRY = str_to_bool(os.getenv('INSECURE_REGISTRY'))
+    PROMETHEUS_HOST = os.getenv('PROMETHEUS_HOST')
+    SCALING_INTERVAL = os.getenv('SCALING_INTERVAL')
+    GRAFANA_HOST = os.getenv('GRAFANA_HOST')
+    GRAFANA_USERNAME = os.getenv('GRAFANA_USERNAME')
+    GRAFANA_PASSWORD = os.getenv('GRAFANA_PASSWORD')
+    SCALING_ENABLED = str_to_bool(os.getenv('SCALING_ENABLED'))
 
 
 class ProdConfig(Config):

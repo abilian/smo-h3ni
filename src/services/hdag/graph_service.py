@@ -1,6 +1,5 @@
 """Application graph deployment business logic."""
 
-import re
 import subprocess
 import tempfile
 import threading
@@ -12,20 +11,14 @@ from werkzeug.exceptions import BadRequest, NotFound
 
 from utils.kube_helper import KubeHelper
 from utils.prometheus_helper import PrometheusHelper
-from models import db, Graph, Service
-from utils.placement import convert_placement, decide_placement, swap_placement
+from models import db, Cluster, Graph, Service
+from utils.placement import convert_placement, decide_placement, swap_placement, calculate_naive_placement
 from utils.scaling import scaling_loop
-
-# TODO: replace constant values
-from utils.constant import CLUSTERS, CLUSTER_CAPACITY, CLUSTER_ACCELERATION, \
-    ACCELERATION, graph_placement, INITIAL_PLACEMENT, ALPHA, BETA, \
-    MAXIMUM_REPLICAS, DECISION_INTERVAL, PROMETHEUS_HOST, GRAPH_GRAFANA, \
-    CPU_LIMITS_LIST, ACCELERATION_LIST, REPLICAS_LIST, CLUSTER_CAPACITY_LIST, \
-    CLUSTER_ACCELERATION_LIST, RESOURCES, SERVICES_GRAFANA, SERVICES
+from utils.intent_translation import tranlsate_cpu, tranlsate_memory, tranlsate_storage
 
 
-background_scaling_threads = [None, None]
-stop_events = [threading.Event(), threading.Event()]
+background_scaling_threads = {}
+stop_events = {}
 
 
 def fetch_project_graphs(project):
@@ -43,8 +36,6 @@ def deploy_graph(project, graph_descriptor):
     deploy each service's artifact.
     """
 
-    global graph_placement
-
     hdag_config = graph_descriptor
     name = hdag_config['id']
 
@@ -57,20 +48,33 @@ def deploy_graph(project, graph_descriptor):
         graph_descriptor=graph_descriptor,
         project=project,
         status='Running',
-        grafana=GRAPH_GRAFANA
+        grafana='N/A'
     )
     db.session.add(graph)
     db.session.commit()
 
-    services = hdag_config['services']
+    background_scaling_threads[name] = [None, None]
+    stop_events[name] = [threading.Event(), threading.Event()]
 
-    placement = decide_placement(
-        CLUSTER_CAPACITY_LIST, CLUSTER_ACCELERATION_LIST, CPU_LIMITS_LIST,
-        ACCELERATION_LIST, REPLICAS_LIST, INITIAL_PLACEMENT,
-        initial_placement=True
+    services = hdag_config['services']
+    cpu_limits = [tranlsate_cpu(service['deployment']['intent']['compute']['cpu']) for service in services]
+    acceleration_list = [1 if service['deployment']['intent']['compute']['gpu']['enabled'] == 'True' else 0 for service in services]
+    replicas = [1 for _ in services]
+
+    available_clusters = db.session.query(Cluster).filter_by(availability=True)
+    cluster_list = [cluster.name for cluster in available_clusters]
+    cluster_capacity = {cluster.name: cluster.available_cpu for cluster in available_clusters}
+    cluster_acceleration = {cluster.name: cluster.acceleration for cluster in available_clusters}
+    cluster_capacity_list = [value for value in cluster_capacity.values()]
+    cluster_acceleration_list = [value for value in cluster_acceleration.values()]
+    placement = calculate_naive_placement(
+        cluster_capacity_list, cluster_acceleration_list, cpu_limits, acceleration_list, replicas
     )
-    graph_placement = placement
-    service_placement = convert_placement(placement, services, CLUSTERS)
+    graph.placement = placement
+    db.session.commit()
+
+
+    service_placement = convert_placement(placement, services, cluster_list)
     cluster_placement = swap_placement(service_placement)
     import_clusters = create_service_imports(services, service_placement)
 
@@ -98,9 +102,14 @@ def deploy_graph(project, graph_descriptor):
                 grace_period = event_condition['gracePeriod']
                 description = event_condition['description']
 
-                prom_helper = PrometheusHelper(PROMETHEUS_HOST)
+                prom_helper = PrometheusHelper(current_app.config['PROMETHEUS_HOST'])
                 alert = create_alert(event_id, prom_query, grace_period, description, name)
                 prom_helper.update_alert_rules(alert, 'add')
+
+        cpu = tranlsate_cpu(service['deployment']['intent']['compute']['cpu'])
+        memory = tranlsate_memory(service['deployment']['intent']['compute']['ram'])
+        storage = tranlsate_storage(service['deployment']['intent']['compute']['storage'])
+        gpu = service['deployment']['intent']['compute']['gpu']['enabled']
 
         if implementer == 'WOT':
             if 'voChartOverwrite' not in values_overwrite:
@@ -121,8 +130,11 @@ def deploy_graph(project, graph_descriptor):
             artifact_ref=artifact_ref,
             artifact_type=artifact_type,
             artifact_implementer=implementer,
-            resources=RESOURCES[name],
-            grafana=SERVICES_GRAFANA[name],
+            cpu=cpu,
+            memory=memory,
+            storage=storage,
+            gpu=gpu,
+            grafana='N/A',
             alert=alert
         )
         db.session.add(svc)
@@ -131,7 +143,8 @@ def deploy_graph(project, graph_descriptor):
         if not conditional_deployment:
             helm_install_artifact(name, artifact_ref, values_overwrite, 'install')
 
-    spawn_scaling_processes(graph.name, cluster_placement)
+    if current_app.config['SCALING_ENABLED']:
+        spawn_scaling_processes(graph.name, cluster_placement)
 
 
 def fetch_graph(name):
@@ -145,24 +158,39 @@ def fetch_graph(name):
 def trigger_placement(name):
     """Triggers the placement algorithm for the given graph."""
 
-    global graph_placement
-
     graph = db.session.query(Graph).filter_by(name=name).first()
     if graph is None:
         raise NotFound(f'Graph with name {name} not found')
 
-    for stop_event in stop_events:
+    for stop_event in stop_events[name]:
         stop_event.set()
     kube_helper = KubeHelper(current_app.config['KARMADA_KUBECONFIG'])
-    current_replicas = [kube_helper.get_replicas(service) for service in SERVICES]
+
+    services = [service.name for service in graph.services]
+    cpu_limits = [service.cpu for service in graph.services]
+    acceleration_list = [service.gpu for service in graph.services]
+    current_replicas = [kube_helper.get_replicas(service) for service in services]
+
+    available_clusters = db.session.query(Cluster).filter_by(availability=True)
+    cluster_list = [cluster.name for cluster in available_clusters]
+    cluster_capacity = {cluster.name: cluster.available_cpu for cluster in available_clusters}
+    cluster_acceleration = {cluster.name: cluster.acceleration for cluster in available_clusters}
+    cluster_capacity_list = [value for value in cluster_capacity.values()]
+    cluster_acceleration_list = [value for value in cluster_acceleration.values()]
+
     placement = decide_placement(
-        CLUSTER_CAPACITY_LIST, CLUSTER_ACCELERATION_LIST, CPU_LIMITS_LIST,
-        ACCELERATION_LIST, current_replicas, graph_placement,
+        cluster_capacity_list, cluster_acceleration_list, cpu_limits,
+        acceleration_list, current_replicas, graph.placement,
         initial_placement=False
     )
+    graph.placement = placement
+    db.session.commit()
     descriptor_services = graph.graph_descriptor['services']
-    graph_placement = placement
-    service_placement = convert_placement(placement, descriptor_services, CLUSTERS)
+
+    available_clusters = db.session.query(Cluster).filter_by(availability=True)
+    cluster_list = [cluster.name for cluster in available_clusters]
+
+    service_placement = convert_placement(placement, descriptor_services, cluster_list)
     cluster_placement = swap_placement(service_placement)
     import_clusters = create_service_imports(descriptor_services, service_placement)
 
@@ -182,7 +210,8 @@ def trigger_placement(name):
 
             helm_install_artifact(service.name, service.artifact_ref, values_overwrite, 'upgrade')
 
-    spawn_scaling_processes(name, cluster_placement)
+    if current_app.config['SCALING_ENABLED']:
+        spawn_scaling_processes(name, cluster_placement)
 
 
 def start_graph(name):
@@ -196,7 +225,7 @@ def start_graph(name):
     graph.status = 'Running'
     for service in graph.services:
         if service.alert != {}:
-            prom_helper = PrometheusHelper(PROMETHEUS_HOST)
+            prom_helper = PrometheusHelper(current_app.config['PROMETHEUS_HOST'])
             prom_helper.update_alert_rules(service.alert, 'add')
         if service.status == 'Deployed':
             helm_install_artifact(
@@ -218,8 +247,12 @@ def stop_graph(name):
         raise BadRequest(f'Graph with name {name} is already stopped')
 
     helm_uninstall_graph(graph.services)
+    for stop_event in stop_events[name]:
+        stop_event.set()
 
     graph.status = 'Stopped'
+    for service in graph.services:
+        service.status = 'Not deployed'
     db.session.commit()
 
 
@@ -231,6 +264,8 @@ def remove_graph(name):
         raise NotFound(f'Graph with name {name} not found')
 
     helm_uninstall_graph(graph.services)
+    for stop_event in stop_events[name]:
+        stop_event.set()
 
     db.session.delete(graph)
     db.session.commit()
@@ -319,6 +354,8 @@ def helm_install_artifact(name, artifact_ref, values_overwrite, command):
             '--kubeconfig',
             current_app.config['KARMADA_KUBECONFIG']
         ]
+        if current_app.config['INSECURE_REGISTRY']:
+            subprocess_arguments.append('--plain-http')
         if command == 'upgrade':
             subprocess_arguments.append('--reuse-values')
         subprocess.run(subprocess_arguments)
@@ -329,7 +366,7 @@ def helm_uninstall_graph(services):
 
     for service in services:
         if service.alert != {}:
-            prom_helper = PrometheusHelper(PROMETHEUS_HOST)
+            prom_helper = PrometheusHelper(current_app.config['PROMETHEUS_HOST'])
             prom_helper.update_alert_rules(service.alert, 'remove')
         if service.status == 'Deployed':
             subprocess.run([
@@ -346,7 +383,17 @@ def helm_uninstall_graph(services):
 def spawn_scaling_processes(graph_name, cluster_placement):
     """Spawns background threads that periodically run the scaling algorithm."""
 
-    for cluster_index, cluster in enumerate(CLUSTERS):
+    MAXIMUM_REPLICAS = {'image-compression-vo': 3,'noise-reduction': 3,'image-detection': 3}
+    ACCELERATION = {'image-compression-vo': 0,'noise-reduction': 0,'image-detection': 0}
+    ALPHA = {'image-compression-vo': 33.33,'noise-reduction': 0.533,'image-detection': 1.67}
+    BETA = {'image-compression-vo': -16.66,'noise-reduction': -0.416,'image-detection': -0.01}
+
+    available_clusters = db.session.query(Cluster).filter_by(availability=True)
+    cluster_list = [cluster.name for cluster in available_clusters]
+    cluster_capacity = {cluster.name: cluster.available_cpu for cluster in available_clusters}
+    cluster_acceleration = {cluster.name: cluster.acceleration for cluster in available_clusters}
+
+    for cluster_index, cluster in enumerate(cluster_list):
         if cluster not in cluster_placement.keys():
             break
         # Fetch cluster specific values
@@ -357,20 +404,20 @@ def spawn_scaling_processes(graph_name, cluster_placement):
         maximum_replicas = [MAXIMUM_REPLICAS[service] for service in managed_services]
 
         stop_events[cluster_index].clear()
-        background_scaling_threads[cluster_index] = threading.Thread(
+        background_scaling_threads[graph_name][cluster_index] = threading.Thread(
             target=scaling_loop,
             args=(
                 graph_name,
                 acceleration,
                 alpha,
                 beta,
-                CLUSTER_CAPACITY[cluster],
-                CLUSTER_ACCELERATION[cluster],
+                cluster_capacity[cluster],
+                cluster_acceleration[cluster],
                 maximum_replicas,
                 managed_services,
-                DECISION_INTERVAL,
+                current_app.config['SCALING_INTERVAL'],
                 current_app.config['KARMADA_KUBECONFIG'],
-                PROMETHEUS_HOST,
+                current_app.config['PROMETHEUS_HOST'],
                 stop_events[cluster_index]
             )
         )

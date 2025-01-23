@@ -40,7 +40,6 @@ def convert_placement(placement, services, clusters):
 def decide_placement(
         cluster_capacities, cluster_acceleration, cpu_limits,
         acceleration, replicas, current_placement,
-        initial_placement=False
 ):
     """
     Parameters
@@ -51,8 +50,6 @@ def decide_placement(
     acceleration: List of GPU acceleration feature for each service
     replicas: List of number of replicas
     current_placement: List of current placement
-    initial_placement: If True doesn't attempt to change the input placement
-                       and can leave it the same. Else forces a change.
 
     Return value
     ---
@@ -103,10 +100,9 @@ def decide_placement(
     for s in S:
         model.addConstr(quicksum(x[s, e] for e in E) == 1, name=f"constraint1_{s}")
 
-    change_placement_value = 0 if initial_placement else -1
     # Define the additional constraints
     model.addConstr(
-        quicksum(y[s][e]*(x[s, e]-y[s][e]) for s in S[1:] for e in E) <= change_placement_value,
+        quicksum(y[s][e]*(x[s, e]-y[s][e]) for s in S[1:] for e in E) <= -1,
         name="constraint_additional_less_than"
     )
 
@@ -137,4 +133,49 @@ def decide_placement(
         for cluster_index, e in enumerate(E):
             if int(x[s, e].X) == 1:
                 placement[service_index][cluster_index] = 1
+    return placement
+
+
+def calculate_naive_placement(cluster_capacities, cluster_accelerations, cpu_limits, accelerations, replicas):
+    """
+    Parameters
+    ---
+    cluster_capacities: List of CPU capacity for each cluster
+    cluster_acceleration: List of GPU acceleration feature for each cluster
+    cpu_limits: List of CPU limits for each service
+    acceleration: List of GPU acceleration feature for each service
+    replicas: List of number of replicas
+
+    Return value
+    ---
+    placement: 2D List of placement. If the element at index [i][j] is 1
+               it means that service i is placed at cluster j
+    """
+
+    num_clusters = len(cluster_capacities)
+    num_nodes = len(cpu_limits)
+
+    service_reqs = [a * b for a, b in zip(replicas, cpu_limits)]
+
+    if max(service_reqs) > min(cluster_capacities):
+        raise ValueError('A single service cannot fit into any cluster. Increase cluster capacity or reduce service requirements.')
+
+    if sum(service_reqs) > sum(cluster_capacities):
+        raise ValueError('Insufficient total capacity to fit all services across the clusters.')
+
+    placement = [[0 for _ in range(num_clusters)] for _ in range(num_nodes)]
+    cluster_usage = [0] * num_clusters
+
+    for service_id, service_req in enumerate(service_reqs):
+        placed = False
+        for cluster_id, cluster_cap in enumerate(cluster_capacities):
+            if accelerations[service_id] <= cluster_accelerations[cluster_id] and\
+                    cluster_usage[cluster_id] + service_req <= cluster_cap:
+                placement[service_id][cluster_id] = 1
+                cluster_usage[cluster_id] += service_req
+                placed = True
+                break
+        if not placed:
+            raise ValueError(f'Service {service_id} with requirement {service_req} could not be placed in any cluster.')
+
     return placement

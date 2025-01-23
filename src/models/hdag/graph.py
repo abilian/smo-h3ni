@@ -13,6 +13,7 @@ class Graph(db.Model):
     project = db.Column(db.String(255))
     grafana = db.Column(db.String(255))
     graph_descriptor = db.Column(JSONB)
+    placement = db.Column(JSONB)
 
     services = db.relationship(
         'Service',

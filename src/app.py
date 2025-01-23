@@ -11,10 +11,10 @@ from config import configs
 from errors import error_handlers
 from models import db
 from routes.hdag.graph import graph
-from routes.nfvcl.bm_k8s import bm_k8s
+from routes.cluster.cluster import cluster
 from routes.nfvcl.os_k8s import os_k8s
 from routes.nfvcl.vim import vim
-from utils.karmada_helper import KarmadaHelper
+from services.cluster.cluster_service import fetch_clusters
 
 env = os.environ.get('FLASK_ENV', 'development')
 
@@ -55,8 +55,8 @@ def create_app(app_name='smo'):
 
     app.config.from_object(configs[env])
 
+    app.register_blueprint(cluster)
     app.register_blueprint(graph)
-    app.register_blueprint(bm_k8s)
     app.register_blueprint(os_k8s)
     app.register_blueprint(vim)
 
@@ -73,8 +73,7 @@ def create_app(app_name='smo'):
     db.init_app(app)
     with app.app_context():
         db.create_all()
-
-    karmada_helper = KarmadaHelper(app.config['KARMADA_KUBECONFIG'])
+        fetch_clusters(app.config['KARMADA_KUBECONFIG'])
 
     return app
 

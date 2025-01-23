@@ -169,3 +169,5 @@ pyrightconfig.json
 hdarctl
 
 .vscode/
+
+*.tar.gz

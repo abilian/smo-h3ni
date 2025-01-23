@@ -12,7 +12,7 @@ graph = Blueprint('graph', __name__)
 
 
 @graph.route('/project/<project>/graphs', methods=['GET'])
-@swag_from('swagger/graph/get_all_graphs.yaml')
+@swag_from('swagger/get_all_graphs.yaml')
 def get_all_graphs(project):
     """Fetches all graphs under a project."""
 
@@ -20,7 +20,7 @@ def get_all_graphs(project):
 
 
 @graph.route('/project/<project>/graphs', methods=['POST'])
-@swag_from('swagger/graph/deploy.yaml')
+@swag_from('swagger/deploy.yaml')
 def deploy(project):
     """
     Handles the graph deployment. The input can either be an artifact
@@ -41,7 +41,7 @@ def deploy(project):
 
 
 @graph.route('/graphs/<name>', methods=['GET'])
-@swag_from('swagger/graph/get_graph.yaml')
+@swag_from('swagger/get_graph.yaml')
 def get_graph(name):
     """Retrieves an application graph descriptor."""
 
@@ -54,7 +54,7 @@ def get_graph(name):
 
 
 @graph.route('/graphs/<name>/placement', methods=['GET'])
-@swag_from('swagger/graph/placement.yaml')
+@swag_from('swagger/placement.yaml')
 def placement(name):
     """Runs the placement algorithm on the graph."""
 
@@ -64,7 +64,7 @@ def placement(name):
 
 
 @graph.route('/graphs/<name>/start', methods=['GET'])
-@swag_from('swagger/graph/start.yaml')
+@swag_from('swagger/start.yaml')
 def start(name):
     """Starts a stopped graph."""
 
@@ -74,7 +74,7 @@ def start(name):
 
 
 @graph.route('/graphs/<name>/stop', methods=['GET'])
-@swag_from('swagger/graph/stop.yaml')
+@swag_from('swagger/stop.yaml')
 def stop(name):
     """Uninstalls graphs artifacts without erasing from the database."""
 
@@ -84,7 +84,7 @@ def stop(name):
 
 
 @graph.route('/graphs/<name>', methods=['DELETE'])
-@swag_from('swagger/graph/remove.yaml')
+@swag_from('swagger/remove.yaml')
 def remove(name):
     """Handles the graph removal."""
 

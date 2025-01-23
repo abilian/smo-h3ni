@@ -1,16 +1,6 @@
 """Helper functions"""
 
 
-def memory_to_bytes(memory_str):
-    """Converts memory multiples to bytes"""
-
-    units = {'Ki': 1024, 'Mi': 1024**2, 'Gi': 1024**3}
-    for unit, multiplier in units.items():
-        if memory_str.endswith(unit):
-            return int(memory_str.replace(unit, '')) * multiplier
-    raise ValueError(f'Unsupported memory unit in {memory_str}')
-
-
 def format_memory(bytes_value):
     """Convert bytes to multiples."""
 

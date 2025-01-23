@@ -1,0 +1,112 @@
+hdaGraph:
+  imVersion: 0.4.0
+  id: image-detection-graph
+  version: "1.0.0"
+  designer: NTUA
+  hdaGraphIntent:
+    security:
+      enabled: False
+    highAvailability:
+      enabled: False
+    highPerformance:
+      enabled: False
+    energyEfficiency:
+      enabled: False
+  description: >-
+    Brussels demo
+  services:
+    - id: image-compression-vo
+      deployment:
+        trigger:
+          event:
+            condition: ANY
+            events:
+              - id: main-event
+                source:
+                  - serviceId: vo
+                    metricId: vo-metric
+                condition:
+                  promQuery: absent(up{prometheus="kc1/kube-prometheus-operator"})
+                  gracePeriod: 2m
+                  description: "High vo-metric"
+        intent:
+          network:
+            deviceProximity:
+              enabled: False
+            latencies: []
+          compute:
+            cpu: "light"
+            ram: "light"
+            storage: "small"
+            gpu:
+              enabled: False
+          coLocation: []
+          connectionPoints: ["noise-reduction"]
+          metrics: []
+      artifact:
+        ociImage: "oci://10.0.3.53:5000/test/image-compression-vo"
+        ociConfig:
+          type: VO
+          implementer: WOT
+        ociRun:
+          name: HELM
+          version: v3
+        valuesOverwrite:
+          voDescriptorOverwrite: {}
+          voChartOverwrite: {}
+    - id: noise-reduction
+      deployment:
+        trigger:
+          auto:
+            dependencies: []
+        intent:
+          network:
+            deviceProximity:
+              enabled: False
+            latencies: []
+          compute:
+            cpu: "small"
+            ram: "small"
+            storage: "small"
+            gpu:
+              enabled: False
+          coLocation: []
+          connectionPoints: ["image-detection"]
+          metrics: []
+      artifact:
+        ociImage: "oci://10.0.3.53:5000/test/noise-reduction"
+        ociConfig:
+          type: App
+          implementer: HELM
+        ociRun:
+          name: HELM
+          version: v3
+        valuesOverwrite: {}
+    - id: image-detection
+      deployment:
+        trigger:
+          auto:
+            dependencies: []
+        intent:
+          network:
+            deviceProximity:
+              enabled: False
+            latencies: []
+          compute:
+            cpu: "small"
+            ram: "small"
+            storage: "small"
+            gpu:
+              enabled: False
+          coLocation: []
+          connectionPoints: []
+          metrics: []
+      artifact:
+        ociImage: "oci://10.0.3.53:5000/test/image-detection"
+        ociConfig:
+          type: App
+          implementer: HELM
+        ociRun:
+          name: HELM
+          version: v3
+        valuesOverwrite: {}
