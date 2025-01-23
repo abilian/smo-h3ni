@@ -72,9 +72,14 @@ A full example can be found in the `examples/brussels-demo` directory. The steps
 4. Cd to the `examples/brussels-demo` directory
 5. Edit the Makefile with the proper IPs
 6. Run `make push-images`
-7. Run `make push-artifacts`
-8. Change the variables inside the `create-existing-artifact.sh` bash script
-9. Run the `create-existing-artifact.sh` bash script to request the Graph deployment from the SMO
+7. Change the `image` URL from `image: 10.0.3.53:5000/<image>:latest` to `image: <Host-IP>:5000/<image>:latest` in the:
+    - `examples/brussels-demo/image-compression-vo/templates`
+    - `examples/brussels-demo/image-detection/templates`
+    - `examples/brussels-demo/noise-reduction/templates`
+8. Change the `ociImage` URL in the `examples/brussels-demo/hdag` for all the services from `ociImage: "oci://10.0.3.53:5000/test/<service>"` to `ociImage: "oci://<Host-IP>:5000/test/<service>"`
+9. Run `make push-artifacts`
+10. Change the variables inside the `create-existing-artifact.sh` bash script
+11. Run the `create-existing-artifact.sh` bash script to request the Graph deployment from the SMO
 
 To delete the graph run the `delete.sh` script.
 
