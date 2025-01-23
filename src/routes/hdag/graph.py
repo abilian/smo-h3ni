@@ -6,7 +6,7 @@ from flask import Blueprint, request
 
 from services.hdag.graph_service import deploy_graph, fetch_graph, \
     fetch_project_graphs, remove_graph, start_graph, stop_graph, \
-    trigger_placement, get_descriptor_from_artifact
+    trigger_placement, get_descriptor_from_artifact, deploy_conditional_service
 
 graph = Blueprint('graph', __name__)
 
@@ -91,3 +91,13 @@ def remove(name):
     remove_graph(name)
 
     return 'Removal successful\n', 200
+
+
+@graph.route('/alerts', methods=['POST'])
+def alert():
+    """Deploys a service that is triggered when an alert has been fired."""
+    data = request.get_json()
+
+    deploy_conditional_service(data)
+
+    return {"message": "Alert received", "data": data}, 200

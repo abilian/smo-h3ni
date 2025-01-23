@@ -17,6 +17,7 @@ class Service(db.Model):
     artifact_implementer = db.Column(db.String(255))
     resources = db.Column(JSONB)
     values_overwrite = db.Column(JSONB)
+    alert = db.Column(JSONB)
 
     graph = db.relationship('Graph', back_populates='services')
     graph_id = db.Column(

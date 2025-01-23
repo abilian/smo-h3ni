@@ -14,6 +14,7 @@ from routes.hdag.graph import graph
 from routes.nfvcl.bm_k8s import bm_k8s
 from routes.nfvcl.os_k8s import os_k8s
 from routes.nfvcl.vim import vim
+from utils.karmada_helper import KarmadaHelper
 
 env = os.environ.get('FLASK_ENV', 'development')
 
@@ -72,6 +73,8 @@ def create_app(app_name='smo'):
     db.init_app(app)
     with app.app_context():
         db.create_all()
+
+    karmada_helper = KarmadaHelper(app.config['KARMADA_KUBECONFIG'])
 
     return app
 

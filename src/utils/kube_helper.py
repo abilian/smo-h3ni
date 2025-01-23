@@ -15,17 +15,21 @@ class KubeHelper():
 
         self.v1_api_client = client.AppsV1Api()
 
+
     def get_desired_replicas(self, name):
         """Returns the desired number of replicas for the specified deployment."""
 
         response = self.v1_api_client.read_namespaced_deployment_scale(name, self.namespace)
         return response.spec.replicas
 
+
     def get_replicas(self, name):
         """Returns the current number of replicas for the specified deployment."""
 
         response = self.v1_api_client.read_namespaced_deployment(name, self.namespace)
+
         return response.status.available_replicas
+
 
     def get_cpu_limit(self, name):
         """Returns the current CPU limit for the specific deployment."""
@@ -36,6 +40,7 @@ class KubeHelper():
             return float(cpu_lim.replace('m', '')) * 1e-3
         else:
             return float(cpu_lim)
+
 
     def scale_deployment(self, name, replicas):
         """Scales the given application to the desired number of replicas"""
