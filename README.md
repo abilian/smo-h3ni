@@ -2,6 +2,37 @@
 
 This repository hosts the Synergetic Meta-Orchestrator consisting of a Flask REST API that is responsible for translating intent formulations, constructing and enforcing deployment plans for Hyper Distributed Application Graphs.
 
+## Prerequisites
+The following assumptions are made:
+- The Kubernetes cluster uses the containerd runtime as CRI
+- The Prometheus CRDs need to be installed in the Karmada Control plane in order for the Service Monitors to work. If not installed,  either install them like this specifying the right version:
+```bash
+# Define the Prometheus Operator version
+VERSION="v0.78.2"
+
+# Base URL for the Prometheus Operator CRDs
+BASE_URL="https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/$VERSION/example/prometheus-operator-crd"
+
+# Kubeconfig file of the Karmada control plane
+KUBECONFIG="~/.kube/karmada-apiserver.config"
+
+# Apply each CRD with server-side apply
+kubectl apply --server-side -f $BASE_URL/monitoring.coreos.com_alertmanagerconfigs.yaml --kubeconfig $KUBECONFIG
+kubectl apply --server-side -f $BASE_URL/monitoring.coreos.com_alertmanagers.yaml --kubeconfig $KUBECONFIG
+kubectl apply --server-side -f $BASE_URL/monitoring.coreos.com_podmonitors.yaml --kubeconfig $KUBECONFIG
+kubectl apply --server-side -f $BASE_URL/monitoring.coreos.com_probes.yaml --kubeconfig $KUBECONFIG
+kubectl apply --server-side -f $BASE_URL/monitoring.coreos.com_prometheusagents.yaml --kubeconfig $KUBECONFIG
+kubectl apply --server-side -f $BASE_URL/monitoring.coreos.com_prometheuses.yaml --kubeconfig $KUBECONFIG
+kubectl apply --server-side -f $BASE_URL/monitoring.coreos.com_prometheusrules.yaml --kubeconfig $KUBECONFIG
+kubectl apply --server-side -f $BASE_URL/monitoring.coreos.com_scrapeconfigs.yaml --kubeconfig $KUBECONFIG
+kubectl apply --server-side -f $BASE_URL/monitoring.coreos.com_servicemonitors.yaml --kubeconfig $KUBECONFIG
+kubectl apply --server-side -f $BASE_URL/monitoring.coreos.com_thanosrulers.yaml --kubeconfig $KUBECONFIG
+
+# Create the monitoring namespace
+kubectl create ns monitoring --kubeconfig $KUBECONFIG
+```
+or delete all `servicemonitor.yaml` files from all the helmcharts.
+
 ## Getting started
 The config files inside the `config` directory contain: the database credentials, the Karmada config and the NFVCL URL
 - The database credentials can be set to whatever the user prefers but the credentials in the `flask.env` and `postgres.env` files must match
