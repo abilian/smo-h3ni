@@ -1,6 +1,7 @@
 # Change to Host's IP
-REGISTRY := 10.0.3.53:5000
-HDAR := http://10.0.3.53:5000
+HOST_IP := 10.0.3.53
+REGISTRY := ${HOST_IP}:5000
+HDAR := http://${HOST_IP}:5000
 PROJECT := test
 
 default: help
@@ -23,6 +24,13 @@ push-images: build-images ## Push all docker images to the registry
 registry-login: ## Login to the HDAR registry
 	echo "Logging in to HDAR located at ${HDAR}..."
 	hdarctl login ${HDAR}
+
+change-ips: ## Changes the IPs declared in the artifacts to the proper ones
+	echo "Changing IPs in the helmcharts..."
+	sed -i 's|image: [^/]*/|image: ${REGISTRY}/|' image-compression-vo/templates/deployment.yaml
+	sed -i 's|image: [^/]*/|image: ${REGISTRY}/|' image-detection/templates/deployment.yaml
+	sed -i 's|image: [^/]*/|image: ${REGISTRY}/|' noise-reduction/templates/deployment.yaml
+	sed -i 's|ociImage: "oci://[^/]*/|ociImage: "oci://${REGISTRY}/|' hdag/hdag.yaml
 
 package-artifacts: ## Package artifacts
 	echo "Packaging artifacts..."

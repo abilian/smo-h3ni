@@ -109,7 +109,7 @@ def deploy_graph(project, graph_descriptor):
         cpu = tranlsate_cpu(service['deployment']['intent']['compute']['cpu'])
         memory = tranlsate_memory(service['deployment']['intent']['compute']['ram'])
         storage = tranlsate_storage(service['deployment']['intent']['compute']['storage'])
-        gpu = service['deployment']['intent']['compute']['gpu']['enabled']
+        gpu = 1 if service['deployment']['intent']['compute']['gpu']['enabled'] == 'True' else 0
 
         if implementer == 'WOT':
             if 'voChartOverwrite' not in values_overwrite:
@@ -180,8 +180,7 @@ def trigger_placement(name):
 
     placement = decide_placement(
         cluster_capacity_list, cluster_acceleration_list, cpu_limits,
-        acceleration_list, current_replicas, graph.placement,
-        initial_placement=False
+        acceleration_list, current_replicas, graph.placement
     )
     graph.placement = placement
     db.session.commit()
@@ -376,8 +375,6 @@ def helm_uninstall_graph(services):
                 '--kubeconfig',
                 current_app.config['KARMADA_KUBECONFIG']
             ])
-    for stop_event in stop_events:
-        stop_event.set()
 
 
 def spawn_scaling_processes(graph_name, cluster_placement):

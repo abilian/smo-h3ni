@@ -71,15 +71,11 @@ A full example can be found in the `examples/brussels-demo` directory. The steps
 3. Start the SMO in detached mode `docker compose up -d`
 4. Cd to the `examples/brussels-demo` directory
 5. Edit the Makefile with the proper IPs
-6. Run `make push-images`
-7. Change the `image` URL from `image: 10.0.3.53:5000/<image>:latest` to `image: <Host-IP>:5000/<image>:latest` in the:
-    - `examples/brussels-demo/image-compression-vo/templates`
-    - `examples/brussels-demo/image-detection/templates`
-    - `examples/brussels-demo/noise-reduction/templates`
-8. Change the `ociImage` URL in the `examples/brussels-demo/hdag` for all the services from `ociImage: "oci://10.0.3.53:5000/test/<service>"` to `ociImage: "oci://<Host-IP>:5000/test/<service>"`
-9. Run `make push-artifacts`
-10. Change the variables inside the `create-existing-artifact.sh` bash script
-11. Run the `create-existing-artifact.sh` bash script to request the Graph deployment from the SMO
+6. Run `make push-images` to push the Docker images of the services to the registry
+7. Run `make change-ips` to change th IPs of the helmcharts and the descriptor
+8. Run `make push-artifacts` to push the helmcharts to the artifact registry
+9. Change the variables inside the `create-existing-artifact.sh` bash script
+10. Run the `create-existing-artifact.sh` bash script to request the Graph deployment from the SMO
 
 To delete the graph run the `delete.sh` script.
 
