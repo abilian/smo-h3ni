@@ -5,10 +5,10 @@ from flask import Blueprint, current_app
 
 from services.cluster.cluster_service import fetch_clusters
 
-cluster = Blueprint('cluster', __name__, url_prefix='/cluster')
+cluster = Blueprint('cluster', __name__, url_prefix='/clusters')
 
 
-@cluster.route('/clusters', methods=['GET'])
+@cluster.route('/', methods=['GET'])
 @swag_from('swagger/get_clusters.yaml')
 def get_clusters():
     """Fetches all Bare-metal Kubernetes clusters."""
