@@ -5,6 +5,7 @@ This repository hosts the Synergetic Meta-Orchestrator consisting of a Flask RES
 ## Prerequisites
 The following assumptions are made:
 - The Kubernetes cluster uses the containerd runtime as CRI
+- Karmada and Submariner have been installed to the cluster
 - The Prometheus CRDs need to be installed in the Karmada Control plane in order for the Service Monitors to work. If not installed,  either install them like this specifying the right version:
 ```bash
 # Define the Prometheus Operator version
