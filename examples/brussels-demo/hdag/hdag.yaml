@@ -33,7 +33,9 @@ hdaGraph:
           network:
             deviceProximity:
               enabled: False
-            latencies: []
+            latencies:
+              - connectionPoint: "noise-reduction"
+                qos: "best-effort"
           compute:
             cpu: "light"
             ram: "light"
