@@ -13,4 +13,8 @@ cluster = Blueprint('cluster', __name__, url_prefix='/clusters')
 def get_clusters():
     """Fetches all Bare-metal Kubernetes clusters."""
 
-    return fetch_clusters(current_app.config['KARMADA_KUBECONFIG']), 200
+    clusters = fetch_clusters(
+        current_app.config['KARMADA_KUBECONFIG'], current_app.config['GRAFANA_HOST'],
+        current_app.config['GRAFANA_USERNAME'], current_app.config['GRAFANA_PASSWORD']
+    )
+    return clusters, 200
