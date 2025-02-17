@@ -1,10 +1,11 @@
 """Kubernetes cluster business logic."""
 
 from models import db, Cluster
+from utils.grafana_helper import GrafanaHelper
 from utils.karmada_helper import KarmadaHelper
 
 
-def fetch_clusters(karmada_kubeconfig):
+def fetch_clusters(karmada_kubeconfig, grafana_host, grafana_username, grafana_password):
     """Retrieves all cluster data."""
 
     cluster_dict = []
@@ -18,6 +19,10 @@ def fetch_clusters(karmada_kubeconfig):
             cluster.available_cpu = info['remaining_cpu']
             cluster.available_ram = info['remaining_memory_bytes']
         else:
+            grafana_helper = GrafanaHelper(grafana_host, grafana_username, grafana_password)
+            dashboard = grafana_helper.create_cluster_dashboard(cluster_name)
+            response = grafana_helper.publish_dashboard(dashboard)
+            grafana_url = f'{grafana_host}{response["url"]}'
             cluster = Cluster(
                 name=cluster_name,
                 location='Unknown',
@@ -25,7 +30,7 @@ def fetch_clusters(karmada_kubeconfig):
                 available_ram=info['remaining_memory_bytes'],
                 availability=info['availability'],
                 acceleration=0,
-                grafana='N/A'
+                grafana=grafana_url
             )
             db.session.add(cluster)
         db.session.commit()

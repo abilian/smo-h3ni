@@ -9,9 +9,10 @@ import yaml
 from flask import current_app
 from werkzeug.exceptions import BadRequest, NotFound
 
+from models import db, Cluster, Graph, Service
+from utils.grafana_helper import GrafanaHelper
 from utils.kube_helper import KubeHelper
 from utils.prometheus_helper import PrometheusHelper
-from models import db, Cluster, Graph, Service
 from utils.placement import convert_placement, decide_placement, swap_placement, calculate_naive_placement
 from utils.scaling import scaling_loop
 from utils.intent_translation import tranlsate_cpu, tranlsate_memory, tranlsate_storage
@@ -36,6 +37,12 @@ def deploy_graph(project, graph_descriptor):
     deploy each service's artifact.
     """
 
+    grafana_helper = GrafanaHelper(
+        current_app.config['GRAFANA_HOST'], current_app.config['GRAFANA_USERNAME'],
+        current_app.config['GRAFANA_PASSWORD']
+    )
+    prom_helper = PrometheusHelper(current_app.config['PROMETHEUS_HOST'])
+
     hdag_config = graph_descriptor
     name = hdag_config['id']
 
@@ -48,7 +55,7 @@ def deploy_graph(project, graph_descriptor):
         graph_descriptor=graph_descriptor,
         project=project,
         status='Running',
-        grafana='N/A'
+        grafana=None
     )
     db.session.add(graph)
     db.session.commit()
@@ -71,16 +78,17 @@ def deploy_graph(project, graph_descriptor):
         cluster_capacity_list, cluster_acceleration_list, cpu_limits, acceleration_list, replicas
     )
     graph.placement = placement
-    db.session.commit()
 
 
     service_placement = convert_placement(placement, services, cluster_list)
     cluster_placement = swap_placement(service_placement)
     import_clusters = create_service_imports(services, service_placement)
 
+    svc_names = []
     for service in services:
         alert = {}
         name = service['id']
+        svc_names.append(name)
         artifact = service['artifact']
         artifact_ref = artifact['ociImage']
         implementer = artifact['ociConfig']['implementer']
@@ -102,7 +110,6 @@ def deploy_graph(project, graph_descriptor):
                 grace_period = event_condition['gracePeriod']
                 description = event_condition['description']
 
-                prom_helper = PrometheusHelper(current_app.config['PROMETHEUS_HOST'])
                 alert = create_alert(event_id, prom_query, grace_period, description, name)
                 prom_helper.update_alert_rules(alert, 'add')
 
@@ -121,6 +128,10 @@ def deploy_graph(project, graph_descriptor):
 
         status = 'Pending' if conditional_deployment else 'Deployed'
 
+        svc_dashboard = grafana_helper.create_graph_service(name)
+        response = grafana_helper.publish_dashboard(svc_dashboard)
+        grafana_url = f'{current_app.config["GRAFANA_HOST"]}{response["url"]}'
+
         svc = Service(
             name=name,
             values_overwrite=values_overwrite,
@@ -134,14 +145,21 @@ def deploy_graph(project, graph_descriptor):
             memory=memory,
             storage=storage,
             gpu=gpu,
-            grafana='N/A',
+            grafana=grafana_url,
             alert=alert
         )
         db.session.add(svc)
-        db.session.commit()
 
         if not conditional_deployment:
             helm_install_artifact(name, artifact_ref, values_overwrite, 'install')
+
+
+    dashboard = grafana_helper.create_graph_dashboard(graph.name, svc_names)
+    response = grafana_helper.publish_dashboard(dashboard)
+    grafana_url = f'{current_app.config["GRAFANA_HOST"]}{response["url"]}'
+    graph.grafana = grafana_url
+
+    db.session.commit()
 
     if current_app.config['SCALING_ENABLED']:
         spawn_scaling_processes(graph.name, cluster_placement)
