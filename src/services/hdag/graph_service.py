@@ -11,7 +11,6 @@ from werkzeug.exceptions import BadRequest, NotFound
 
 from models import db, Cluster, Graph, Service
 from utils.grafana_helper import GrafanaHelper
-from utils.kube_helper import KubeHelper
 from utils.karmada_helper import KarmadaHelper
 from utils.prometheus_helper import PrometheusHelper
 from utils.placement import convert_placement, decide_placement, swap_placement, calculate_naive_placement
