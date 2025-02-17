@@ -74,8 +74,8 @@ def create_app(app_name='smo'):
     with app.app_context():
         db.create_all()
         fetch_clusters(
-            app.config['KARMADA_KUBECONFIG'], app.config['GRAFANA_HOST'],
-            app.config['GRAFANA_USERNAME'], app.config['GRAFANA_PASSWORD']
+            app.config['KARMADA_KUBECONFIG'], app.config['SUBMARINER_KUBECONFIG']
+            app.config['GRAFANA_HOST'], app.config['GRAFANA_USERNAME'], app.config['GRAFANA_PASSWORD']
         )
 
     return app

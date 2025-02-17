@@ -5,7 +5,7 @@ import time
 import requests
 from gurobipy import Model, GRB, quicksum
 
-from utils.kube_helper import KubeHelper
+from utils.karmada_helper import KarmadaHelper
 from utils.prometheus_helper import PrometheusHelper
 
 
@@ -16,17 +16,17 @@ def scaling_loop(
 ):
     """Runs the scaling algorithm periodically."""
 
-    kube_helper = KubeHelper(config_file_path)
+    karmada_helper = KarmadaHelper(config_file_path)
     prometheus_helper = PrometheusHelper(prometheus_host, decision_interval)
     while True:
-        previous_replicas = [kube_helper.get_replicas(service) for service in managed_services]
+        previous_replicas = [karmada_helper.get_replicas(service) for service in managed_services]
         if None in previous_replicas:
             time.sleep(5)
         else:
             break
 
-    previous_replicas = [kube_helper.get_replicas(service) for service in managed_services]
-    cpu_limits = [kube_helper.get_cpu_limit(service) for service in managed_services]
+    previous_replicas = [karmada_helper.get_replicas(service) for service in managed_services]
+    cpu_limits = [karmada_helper.get_cpu_limit(service) for service in managed_services]
 
     while not stop_event.is_set():
         request_rates = []
