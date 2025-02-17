@@ -12,6 +12,7 @@ from werkzeug.exceptions import BadRequest, NotFound
 from models import db, Cluster, Graph, Service
 from utils.grafana_helper import GrafanaHelper
 from utils.kube_helper import KubeHelper
+from utils.karmada_helper import KarmadaHelper
 from utils.prometheus_helper import PrometheusHelper
 from utils.placement import convert_placement, decide_placement, swap_placement, calculate_naive_placement
 from utils.scaling import scaling_loop
@@ -182,12 +183,12 @@ def trigger_placement(name):
 
     for stop_event in stop_events[name]:
         stop_event.set()
-    kube_helper = KubeHelper(current_app.config['KARMADA_KUBECONFIG'])
+    karmada_helper = KarmadaHelper(current_app.config['KARMADA_KUBECONFIG'])
 
     services = [service.name for service in graph.services]
     cpu_limits = [service.cpu for service in graph.services]
     acceleration_list = [service.gpu for service in graph.services]
-    current_replicas = [kube_helper.get_replicas(service) for service in services]
+    current_replicas = [karmada_helper.get_replicas(service) for service in services]
 
     available_clusters = db.session.query(Cluster).filter_by(availability=True)
     cluster_list = [cluster.name for cluster in available_clusters]

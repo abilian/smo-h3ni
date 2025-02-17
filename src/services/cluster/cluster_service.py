@@ -3,17 +3,22 @@
 from models import db, Cluster
 from utils.grafana_helper import GrafanaHelper
 from utils.karmada_helper import KarmadaHelper
+from utils.submariner_helper import SubmarinerHelper
 
 
-def fetch_clusters(karmada_kubeconfig, grafana_host, grafana_username, grafana_password):
+def fetch_clusters(karmada_kubeconfig, submariner_kubeconfig, grafana_host, grafana_username, grafana_password):
     """Retrieves all cluster data."""
 
     cluster_dict = []
 
     karmada_helper = KarmadaHelper(karmada_kubeconfig)
-    cluster_info = karmada_helper.get_cluster_info()
+    karmada_cluster_info = karmada_helper.get_cluster_info()
 
-    for cluster_name, info in cluster_info.items():
+    submariner_helper = SubmarinerHelper(submariner_kubeconfig)
+    submariner_cluster_info = submariner_helper.get_cluster_info()
+
+
+    for cluster_name, info in karmada_cluster_info.items():
         cluster = db.session.query(Cluster).filter(Cluster.name == cluster_name).first()
         if cluster is not None:
             cluster.available_cpu = info['remaining_cpu']
@@ -30,6 +35,8 @@ def fetch_clusters(karmada_kubeconfig, grafana_host, grafana_username, grafana_p
                 available_ram=info['remaining_memory_bytes'],
                 availability=info['availability'],
                 acceleration=0,
+                pod_cidr=submariner_cluster_info[cluster_name]['pod_cidr'],
+                service_cidr=submariner_cluster_info[cluster_name]['service_cidr'],
                 grafana=grafana_url
             )
             db.session.add(cluster)
