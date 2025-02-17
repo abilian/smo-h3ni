@@ -151,7 +151,7 @@ def deploy_graph(project, graph_descriptor):
         db.session.add(svc)
 
         if not conditional_deployment:
-            helm_install_artifact(name, artifact_ref, values_overwrite, 'install')
+            helm_install_artifact(name, artifact_ref, values_overwrite, graph.project, 'install')
 
 
     dashboard = grafana_helper.create_graph_dashboard(graph.name, svc_names)
@@ -225,7 +225,7 @@ def trigger_placement(name):
             service.values_overwrite = values_overwrite
             db.session.commit()
 
-            helm_install_artifact(service.name, service.artifact_ref, values_overwrite, 'upgrade')
+            helm_install_artifact(service.name, service.artifact_ref, values_overwrite, graph.project, 'upgrade')
 
     if current_app.config['SCALING_ENABLED']:
         spawn_scaling_processes(name, cluster_placement)
@@ -249,6 +249,7 @@ def start_graph(name):
                 service.name,
                 service.artifact_ref,
                 service.values_overwrite,
+                graph.project,
                 'install'
             )
     db.session.commit()
@@ -263,7 +264,7 @@ def stop_graph(name):
     if graph.status == 'Stopped':
         raise BadRequest(f'Graph with name {name} is already stopped')
 
-    helm_uninstall_graph(graph.services)
+    helm_uninstall_graph(graph.services, graph.project)
     for stop_event in stop_events[name]:
         stop_event.set()
 
@@ -280,7 +281,7 @@ def remove_graph(name):
     if graph is None:
         raise NotFound(f'Graph with name {name} not found')
 
-    helm_uninstall_graph(graph.services)
+    helm_uninstall_graph(graph.services, graph.project)
     for stop_event in stop_events[name]:
         stop_event.set()
 
@@ -298,10 +299,11 @@ def deploy_conditional_service(data):
             alertname = labels['alertname']
             service_name = labels['service']
             service = db.session.query(Service).filter_by(name=service_name).first()
+            graph = service.graph
             if service is None:
                 continue
 
-            helm_install_artifact(service.name, service.artifact_ref, service.values_overwrite, 'install')
+            helm_install_artifact(service.name, service.artifact_ref, service.values_overwrite, graph.project, 'install')
 
             service.status = 'Deployed'
             db.session.commit()
@@ -355,7 +357,7 @@ def get_descriptor_from_artifact(project, artifact_ref):
                         return data
 
 
-def helm_install_artifact(name, artifact_ref, values_overwrite, command):
+def helm_install_artifact(name, artifact_ref, values_overwrite, namespace, command):
     """Executes helm command (install/upgrade) for artifact."""
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml') as values_file:
@@ -368,6 +370,9 @@ def helm_install_artifact(name, artifact_ref, values_overwrite, command):
             artifact_ref,
             '--values',
             values_file.name,
+            '--namespace',
+            namespace,
+            '--create-namespace',
             '--kubeconfig',
             current_app.config['KARMADA_KUBECONFIG']
         ]
@@ -378,7 +383,7 @@ def helm_install_artifact(name, artifact_ref, values_overwrite, command):
         subprocess.run(subprocess_arguments)
 
 
-def helm_uninstall_graph(services):
+def helm_uninstall_graph(services, namespace):
     """Uninstalls all service artifacts."""
 
     for service in services:
@@ -390,6 +395,8 @@ def helm_uninstall_graph(services):
                 'helm',
                 'uninstall',
                 service.name,
+                '--namespace',
+                namespace,
                 '--kubeconfig',
                 current_app.config['KARMADA_KUBECONFIG']
             ])
