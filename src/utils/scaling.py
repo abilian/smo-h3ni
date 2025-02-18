@@ -3,7 +3,7 @@
 import time
 
 import requests
-from gurobipy import Model, GRB, quicksum
+import cvxpy as cp
 
 from utils.karmada_helper import KarmadaHelper
 from utils.prometheus_helper import PrometheusHelper
@@ -43,7 +43,7 @@ def scaling_loop(
             beta, cluster_capacity, cluster_acceleration, maximum_replicas
         )
         if new_replicas is None:
-            requests.get(f'http://localhost:8000/graph/{graph_name}/placement')
+            requests.get(f'http://localhost:8000/graphs/{graph_name}/placement')
         else:
             for idx, replicas in enumerate(new_replicas):
                 kube_helper.scale_deployment(managed_services[idx], replicas)
@@ -76,65 +76,48 @@ def decide_replicas(
     solution: List with replicas for each service
     """
 
-    # Define the number of application nodes
     num_nodes = len(previous_replicas)
 
-    # Create a Gurobi model
-    model = Model("AutoScalingOptimization")
+    # Decision variables
+    r_current = [cp.Variable(integer=True, name=f"r_current_{s}") for s in range(num_nodes)]
+    abs_diff = [cp.Variable(nonneg=True, name=f"abs_diff_{s}") for s in range(num_nodes)]
 
-    # Define decision variables
-    r_current = {}
-    r_prev = {}
-    abs_diff = {}  # to define the scaling (transformation) cost with absolute of difference
-
-    for s in range(num_nodes):
-        r_current[s] = model.addVar(vtype=GRB.INTEGER, name=f"r_{s}_current")
-        r_prev[s] = previous_replicas[s]  # Set the previously deployed replicas
-        abs_diff[s] = model.addVar(vtype=GRB.INTEGER, name=f"abs_diff_{s}")
-
-    # Update model
-    model.update()
-
-    # Absolute difference constraints
-    for s in range(num_nodes):
-        model.addConstr(abs_diff[s] >= r_prev[s] - r_current[s], name=f"abs_diff_pos_{s}")
-        model.addConstr(abs_diff[s] >= -(r_prev[s] - r_current[s]), name=f"abs_diff_neg_{s}")
-
-    # Example weights (adjust as needed)
     w_util = 0.4
     w_trans = 0.4
-    # w_penalty = 0.2
 
     # Max values for normalization
     max_util_cost = max(maximum_replicas[s] * cpu_limits[s] for s in range(num_nodes))
     max_trans_cost = maximum_replicas
 
-    # Penalty term: normalized percentage of over-provisioning
-    # penalty_term =  quicksum((r_current[s]*q[s] - request_rates[s] / q[s]) / (maximum_replicas*q[s] - request_rates[s] / q[s]) for s in range(num_nodes))
+    constraints = []
 
-    # Objective function
-    model.setObjective(
-        w_util * quicksum(r_current[s] * cpu_limits[s] / max_util_cost for s in range(num_nodes)) +
-        w_trans * quicksum(abs_diff[s] / max_trans_cost[s] for s in range(num_nodes)),
-        # w_penalty * penalty_term,
-        GRB.MINIMIZE
+    # Absolute difference constraints
+    for s in range(num_nodes):
+        constraints.append(abs_diff[s] >= previous_replicas[s] - r_current[s])
+        constraints.append(abs_diff[s] >= -(previous_replicas[s] - r_current[s]))
+
+    # Cluster CPU capacity constraint
+    constraints.append(
+        cp.sum([cpu_limits[s] * r_current[s] for s in range(num_nodes)]) <= cluster_capacity
     )
 
-    # Constraints
-    model.addConstr(quicksum(cpu_limits[s] * r_current[s] for s in range(num_nodes)) <= cluster_capacity, name="cluster_cpu_limit_constraint")
-    # Constraints
+    # Per-node constraints
     for s in range(num_nodes):
-        model.addConstr(acceleration[s] <= cluster_acceleration, name=f"constraint_acceleration_{s}")
-        model.addConstr(alpha[s] * r_current[s] + beta[s] >= request_rates[s], name=f"constraint_service_rate_{s}")
-        model.addConstr(1 <= r_current[s], name=f"lower_bound_replicas{s}")
-        # model.addConstr(r_current[s] <= maximum_replicas[s], name=f"upper_bound_replicas_{s}")
+        constraints.append(acceleration[s] <= cluster_acceleration)
+        constraints.append(alpha[s] * r_current[s] + beta[s] >= request_rates[s])
+        constraints.append(r_current[s] >= 1)
 
-    # Solve the model
-    model.optimize()
+    objective = cp.Minimize(
+        w_util * cp.sum([r_current[s] * cpu_limits[s] / max_util_cost for s in range(num_nodes)]) +
+        w_trans * cp.sum([abs_diff[s] / max_trans_cost[s] for s in range(num_nodes)])
+    )
 
-    # Check the solution status
-    if model.status == GRB.Status.OPTIMAL:
-        solution = [int(r.X) for r in r_current.values()]
+    problem = cp.Problem(objective, constraints)
+
+    problem.solve(solver=cp.GLPK_MI, qcp=True)
+
+    if problem.status == cp.OPTIMAL:
+        solution = [int(round(r.value)) for r in r_current]
         return solution
     else:
         return None
