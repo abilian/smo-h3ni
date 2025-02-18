@@ -46,7 +46,7 @@ def scaling_loop(
             requests.get(f'http://localhost:8000/graphs/{graph_name}/placement')
         else:
             for idx, replicas in enumerate(new_replicas):
-                kube_helper.scale_deployment(managed_services[idx], replicas)
+                karmada_helper.scale_deployment(managed_services[idx], replicas)
         print(new_replicas)
 
         previous_replicas = new_replicas
