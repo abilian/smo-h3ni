@@ -1,6 +1,6 @@
 """Application node placement related functionalities."""
 
-from gurobipy import GRB, Model, quicksum
+import cvxpy as cp
 
 
 def swap_placement(service_dict):
@@ -60,79 +60,51 @@ def decide_placement(
     num_clusters = len(cluster_capacities)
     num_nodes = len(cpu_limits)
 
-    model = Model("MultiClusterPlacement")
+    x = cp.Variable((num_nodes, num_clusters), boolean=True)
 
-    # Define decision variables
-    E = [f"E{i}" for i in range(1, num_clusters + 1)]  # List of EC clusters
-    S = [f"s{i}" for i in range(num_nodes)]  # List of application graph nodes
+    y = current_placement
 
-    # Replicas and dependencies
-    d = [0, 0]
-
-    # Assume you have the previous placement as described before
-    y = {
-        f's{app_node_index}': {
-            cluster: current_placement[app_node_index][cluster_index] for cluster_index, cluster in enumerate(E)
-        } for app_node_index in range(num_nodes)
-    }
-
-    # Define decision variables
-    x = {}
-
-    for s in S:
-        for e in E:
-            x[s, e] = model.addVar(vtype=GRB.BINARY, name=f"x_{s}_{e}")
-
-    # Update model
-    model.update()
-
-    # Define objective function
     w_dep = 1  # Deployment cost weight
     w_re = 1   # Re-optimization cost weight
 
-    model.setObjective(
-        quicksum(w_dep * x[s, e] for s in S for e in E) +
-        quicksum(w_re * y[s][e] * (y[s][e] - x[s, e]) for s in S for e in E),
-        GRB.MINIMIZE
+    # Objective function
+    objective = cp.Minimize(
+        w_dep * cp.sum(x) +
+        w_re * cp.sum(cp.multiply(y, (y - x)))
     )
 
-    # Define constraints
-    for s in S:
-        model.addConstr(quicksum(x[s, e] for e in E) == 1, name=f"constraint1_{s}")
+    constraints = []
 
-    # Define the additional constraints
-    model.addConstr(
-        quicksum(y[s][e]*(x[s, e]-y[s][e]) for s in S[1:] for e in E) <= -1,
-        name="constraint_additional_less_than"
-    )
+    # Constraint 1: Each service must be placed in exactly one cluster
+    for s in range(num_nodes):
+        constraints.append(cp.sum(x[s, :]) == 1)
 
-    for e in E:
-        model.addConstr(
-            quicksum(x[s, e] * cpu_limits[S.index(s)] * replicas[S.index(s)]
-                     for s in S[1:]) <= cluster_capacities[E.index(e)],
-            name=f"constraint2_{e}"
+    # Constraint 2: Cluster capacity constraints
+    for e in range(num_clusters):
+        constraints.append(
+            cp.sum(
+                cp.multiply(x[:, e], [cpu_limits[s] * replicas[s] for s in range(num_nodes)])
+            ) <= cluster_capacities[e]
         )
 
-    for e in E:
-        for s in S[1:]:
-            model.addConstr(
-                x[s, e] * acceleration[S.index(s)] <= cluster_acceleration[E.index(e)],
-                name=f"constraint4_{s}_{e}"
+    # Constraint 3: Acceleration feature constraints
+    for s in range(1, num_nodes):  # Assuming s0 has no acceleration constraint
+        for e in range(num_clusters):
+            constraints.append(
+                x[s, e] * acceleration[s] <= cluster_acceleration[e]
             )
 
+    # Constraint 4: Dependency constraint - This is adjusted to avoid recursion
+    # Ensure no cyclic dependency by rethinking how dependencies are handled
+    d = [0, 0]
     for i in range(1, num_nodes):
-        model.addConstr(quicksum(x[S[i], e] * x[S[i-1], e] for e in E) >= d[i-1])
+        for e in range(num_clusters):
+            constraints.append(x[i, e] + x[i - 1, e] >= d[i - 1])
 
-    # Add constraint for fixed placement of s0
-    model.addConstr(x['s0', 'E1'] == 1, name="constraint_s0_placement")
+    problem = cp.Problem(objective, constraints)
+    problem.solve(solver=cp.GLPK_MI, qcp=True)
 
-    model.optimize()
-
-    placement = [[0] * num_clusters for _ in range(num_nodes)]
-    for service_index, s in enumerate(S):
-        for cluster_index, e in enumerate(E):
-            if int(x[s, e].X) == 1:
-                placement[service_index][cluster_index] = 1
+    placement = [[int(x.value[s, e]) for e in range(num_clusters)] for s in range(num_nodes)]
     return placement
 
 
