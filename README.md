@@ -39,6 +39,12 @@ The config files inside the `config` directory contain: the database credentials
 - The database credentials can be set to whatever the user prefers but the credentials in the `flask.env` and `postgres.env` files must match
 - Regarding the Karmada config, the docker compose YAML mounts the `~/.kube` directory inside the container meaning that the SMO expects the karmada kubeconfig file to be inside that directory. Afterwards, the user can specify the name of the config file in the `KARMADA_KUBECONFIG` environment variable of the `config/flask.env` file.
 - The NVFCL URL is optional and only relevant if the NFVCL API is used
+- The `hdarctl` binary has to be available in the path. You can run for example:
+    ```bash
+    wget https://gitlab.eclipse.org/eclipse-research-labs/nephele-project/nephele-development-sandbox/-/raw/main/tools/hdarctl
+    sudo chmod u+x hdarctl
+    sudo mv hdarctl /usr/local/bin
+    ```
 
 To deploy, use docker compose:
 ```bash

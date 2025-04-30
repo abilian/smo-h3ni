@@ -21,6 +21,9 @@ class Config:
     KARMADA_KUBECONFIG = '/home/python/.kube/{}'.format(
         os.getenv('KARMADA_KUBECONFIG', 'karmada-apiserver.config')
     )
+    SUBMARINER_KUBECONFIG = '/home/python/.kube/{}'.format(
+        os.getenv('SUBMARINER_KUBECONFIG', 'config')
+    )
     NFVCL_BASE_URL = os.getenv('NFVCL_BASE_URL')
     INSECURE_REGISTRY = str_to_bool(os.getenv('INSECURE_REGISTRY'))
     PROMETHEUS_HOST = os.getenv('PROMETHEUS_HOST')

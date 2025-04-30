@@ -22,7 +22,9 @@ This demo is composed of an image detection graph.
 - **README.md**: This file
 
 ## Instructions
-This directory has a Makefile to more easily prepare the demo. Make sure to change the values of the variables on top of the Makefile
+This directory has a Makefile to more easily prepare the demo.
+> ### ⚠️ Warning
+> Make sure to change the values of the variables on top of the Makefile
 ### Build images
 By running:
 ```bash

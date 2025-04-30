@@ -9,9 +9,10 @@ import yaml
 from flask import current_app
 from werkzeug.exceptions import BadRequest, NotFound
 
-from utils.kube_helper import KubeHelper
-from utils.prometheus_helper import PrometheusHelper
 from models import db, Cluster, Graph, Service
+from utils.grafana_helper import GrafanaHelper
+from utils.karmada_helper import KarmadaHelper
+from utils.prometheus_helper import PrometheusHelper
 from utils.placement import convert_placement, decide_placement, swap_placement, calculate_naive_placement
 from utils.scaling import scaling_loop
 from utils.intent_translation import tranlsate_cpu, tranlsate_memory, tranlsate_storage
@@ -36,6 +37,12 @@ def deploy_graph(project, graph_descriptor):
     deploy each service's artifact.
     """
 
+    grafana_helper = GrafanaHelper(
+        current_app.config['GRAFANA_HOST'], current_app.config['GRAFANA_USERNAME'],
+        current_app.config['GRAFANA_PASSWORD']
+    )
+    prom_helper = PrometheusHelper(current_app.config['PROMETHEUS_HOST'])
+
     hdag_config = graph_descriptor
     name = hdag_config['id']
 
@@ -48,7 +55,7 @@ def deploy_graph(project, graph_descriptor):
         graph_descriptor=graph_descriptor,
         project=project,
         status='Running',
-        grafana='N/A'
+        grafana=None
     )
     db.session.add(graph)
     db.session.commit()
@@ -71,16 +78,17 @@ def deploy_graph(project, graph_descriptor):
         cluster_capacity_list, cluster_acceleration_list, cpu_limits, acceleration_list, replicas
     )
     graph.placement = placement
-    db.session.commit()
 
 
     service_placement = convert_placement(placement, services, cluster_list)
     cluster_placement = swap_placement(service_placement)
     import_clusters = create_service_imports(services, service_placement)
 
+    svc_names = []
     for service in services:
         alert = {}
         name = service['id']
+        svc_names.append(name)
         artifact = service['artifact']
         artifact_ref = artifact['ociImage']
         implementer = artifact['ociConfig']['implementer']
@@ -102,7 +110,6 @@ def deploy_graph(project, graph_descriptor):
                 grace_period = event_condition['gracePeriod']
                 description = event_condition['description']
 
-                prom_helper = PrometheusHelper(current_app.config['PROMETHEUS_HOST'])
                 alert = create_alert(event_id, prom_query, grace_period, description, name)
                 prom_helper.update_alert_rules(alert, 'add')
 
@@ -121,6 +128,10 @@ def deploy_graph(project, graph_descriptor):
 
         status = 'Pending' if conditional_deployment else 'Deployed'
 
+        svc_dashboard = grafana_helper.create_graph_service(name)
+        response = grafana_helper.publish_dashboard(svc_dashboard)
+        grafana_url = f'{current_app.config["GRAFANA_HOST"]}{response["url"]}'
+
         svc = Service(
             name=name,
             values_overwrite=values_overwrite,
@@ -134,14 +145,21 @@ def deploy_graph(project, graph_descriptor):
             memory=memory,
             storage=storage,
             gpu=gpu,
-            grafana='N/A',
+            grafana=grafana_url,
             alert=alert
         )
         db.session.add(svc)
-        db.session.commit()
 
         if not conditional_deployment:
-            helm_install_artifact(name, artifact_ref, values_overwrite, 'install')
+            helm_install_artifact(name, artifact_ref, values_overwrite, graph.project, 'install')
+
+
+    dashboard = grafana_helper.create_graph_dashboard(graph.name, svc_names)
+    response = grafana_helper.publish_dashboard(dashboard)
+    grafana_url = f'{current_app.config["GRAFANA_HOST"]}{response["url"]}'
+    graph.grafana = grafana_url
+
+    db.session.commit()
 
     if current_app.config['SCALING_ENABLED']:
         spawn_scaling_processes(graph.name, cluster_placement)
@@ -164,12 +182,12 @@ def trigger_placement(name):
 
     for stop_event in stop_events[name]:
         stop_event.set()
-    kube_helper = KubeHelper(current_app.config['KARMADA_KUBECONFIG'])
+    karmada_helper = KarmadaHelper(current_app.config['KARMADA_KUBECONFIG'])
 
     services = [service.name for service in graph.services]
     cpu_limits = [service.cpu for service in graph.services]
     acceleration_list = [service.gpu for service in graph.services]
-    current_replicas = [kube_helper.get_replicas(service) for service in services]
+    current_replicas = [karmada_helper.get_replicas(service) for service in services]
 
     available_clusters = db.session.query(Cluster).filter_by(availability=True)
     cluster_list = [cluster.name for cluster in available_clusters]
@@ -207,7 +225,7 @@ def trigger_placement(name):
             service.values_overwrite = values_overwrite
             db.session.commit()
 
-            helm_install_artifact(service.name, service.artifact_ref, values_overwrite, 'upgrade')
+            helm_install_artifact(service.name, service.artifact_ref, values_overwrite, graph.project, 'upgrade')
 
     if current_app.config['SCALING_ENABLED']:
         spawn_scaling_processes(name, cluster_placement)
@@ -231,6 +249,7 @@ def start_graph(name):
                 service.name,
                 service.artifact_ref,
                 service.values_overwrite,
+                graph.project,
                 'install'
             )
     db.session.commit()
@@ -245,7 +264,7 @@ def stop_graph(name):
     if graph.status == 'Stopped':
         raise BadRequest(f'Graph with name {name} is already stopped')
 
-    helm_uninstall_graph(graph.services)
+    helm_uninstall_graph(graph.services, graph.project)
     for stop_event in stop_events[name]:
         stop_event.set()
 
@@ -262,7 +281,7 @@ def remove_graph(name):
     if graph is None:
         raise NotFound(f'Graph with name {name} not found')
 
-    helm_uninstall_graph(graph.services)
+    helm_uninstall_graph(graph.services, graph.project)
     for stop_event in stop_events[name]:
         stop_event.set()
 
@@ -280,10 +299,11 @@ def deploy_conditional_service(data):
             alertname = labels['alertname']
             service_name = labels['service']
             service = db.session.query(Service).filter_by(name=service_name).first()
+            graph = service.graph
             if service is None:
                 continue
 
-            helm_install_artifact(service.name, service.artifact_ref, service.values_overwrite, 'install')
+            helm_install_artifact(service.name, service.artifact_ref, service.values_overwrite, graph.project, 'install')
 
             service.status = 'Deployed'
             db.session.commit()
@@ -337,7 +357,7 @@ def get_descriptor_from_artifact(project, artifact_ref):
                         return data
 
 
-def helm_install_artifact(name, artifact_ref, values_overwrite, command):
+def helm_install_artifact(name, artifact_ref, values_overwrite, namespace, command):
     """Executes helm command (install/upgrade) for artifact."""
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml') as values_file:
@@ -350,6 +370,9 @@ def helm_install_artifact(name, artifact_ref, values_overwrite, command):
             artifact_ref,
             '--values',
             values_file.name,
+            '--namespace',
+            namespace,
+            '--create-namespace',
             '--kubeconfig',
             current_app.config['KARMADA_KUBECONFIG']
         ]
@@ -360,7 +383,7 @@ def helm_install_artifact(name, artifact_ref, values_overwrite, command):
         subprocess.run(subprocess_arguments)
 
 
-def helm_uninstall_graph(services):
+def helm_uninstall_graph(services, namespace):
     """Uninstalls all service artifacts."""
 
     for service in services:
@@ -372,6 +395,8 @@ def helm_uninstall_graph(services):
                 'helm',
                 'uninstall',
                 service.name,
+                '--namespace',
+                namespace,
                 '--kubeconfig',
                 current_app.config['KARMADA_KUBECONFIG']
             ])
