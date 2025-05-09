@@ -4,7 +4,7 @@ default:
 
 smo:
   stage: build
-  image: python
+  image: python:3.12
 
   variables:
     POSTGRESQL_DATABASE: smo
