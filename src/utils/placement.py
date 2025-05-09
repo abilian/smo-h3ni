@@ -1,6 +1,7 @@
 """Application node placement related functionalities."""
 
 import cvxpy as cp
+import numpy as np
 
 
 def swap_placement(service_dict):
@@ -43,26 +44,25 @@ def decide_placement(
 ):
     """
     Parameters
-    ---
+    ----------
     cluster_capacities: List of CPU capacity for each cluster
     cluster_acceleration: List of GPU acceleration feature for each cluster
     cpu_limits: List of CPU limits for each service
     acceleration: List of GPU acceleration feature for each service
     replicas: List of number of replicas
-    current_placement: List of current placement
+    current_placement: 2D list of current placement (same shape as output)
 
     Return value
-    ---
+    ------------
     placement: 2D List of placement. If the element at index [i][j] is 1
                it means that service i is placed at cluster j
     """
-
     num_clusters = len(cluster_capacities)
     num_nodes = len(cpu_limits)
 
     x = cp.Variable((num_nodes, num_clusters), boolean=True)
 
-    y = current_placement
+    y = np.array(current_placement)
 
     w_dep = 1  # Deployment cost weight
     w_re = 1   # Re-optimization cost weight
@@ -102,7 +102,7 @@ def decide_placement(
             constraints.append(x[i, e] + x[i - 1, e] >= d[i - 1])
 
     problem = cp.Problem(objective, constraints)
-    problem.solve(solver=cp.GLPK_MI, qcp=True)
+    problem.solve(solver=cp.CBC)
 
     placement = [[int(x.value[s, e]) for e in range(num_clusters)] for s in range(num_nodes)]
     return placement

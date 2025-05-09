@@ -114,7 +114,7 @@ def decide_replicas(
 
     problem = cp.Problem(objective, constraints)
 
-    problem.solve(solver=cp.GLPK_MI, qcp=True)
+    problem.solve(solver=cp.CBC)
 
     if problem.status == cp.OPTIMAL:
         solution = [int(round(r.value)) for r in r_current]
