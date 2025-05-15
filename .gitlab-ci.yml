@@ -18,7 +18,7 @@ smo:
   script:
     - export PGPASSWORD=$POSTGRESQL_PASSWORD
     - sleep 4
-    - pip install -r requirements.txt
+    - pip install .
     - cd src
     - python app.py &> flask.log &
     - sleep 7
