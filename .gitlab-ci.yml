@@ -19,8 +19,13 @@ smo:
     - export PGPASSWORD=$POSTGRESQL_PASSWORD
     - sleep 4
     - pip install .
+    # Unit tests
+    - pip install uv
+    - uv sync
+    - uv run pytest
     # - make test
-    - pytest
+    # - pytest
+    # Smoke test for Flask app
     - cd src
     - python app.py &> flask.log &
     - sleep 7
