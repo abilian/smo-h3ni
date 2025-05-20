@@ -1,5 +1,12 @@
 # SMO
 
+> This is a forked version of the original Nephele SMO repository. The original repository is located at: https://gitlab.eclipse.org/eclipse-research-labs/nephele-project/smo
+> This is a work in progress. The development plan is outlined in the [TODO.md](./TODO.md) file.
+
+---
+
+(Original README below)
+
 This repository hosts the Synergetic Meta-Orchestrator consisting of a Flask REST API that is responsible for translating intent formulations, constructing and enforcing deployment plans for Hyper Distributed Application Graphs.
 
 ## Prerequisites
