@@ -40,7 +40,12 @@ packages = ["src/"]
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.5",
+    # Testing
+    "pytest",
+    # Linting
+    "ruff",
+    "flake8",
+    "mccabe",
 ]
 
 
@@ -84,15 +89,6 @@ dev = [
 ##requires = ["hatchling"]
 ##build-backend = "hatchling.build"
 #
-#[dependency-groups]
-#dev = [
-#    # Testing
-#    "pytest",
-#    # Linting
-#    "ruff",
-#    "flake8",
-#    "mccabe",
-#]
 #
 ## -----------------------------------------------------------------------------
 #
