@@ -102,7 +102,7 @@ def decide_placement(
             constraints.append(x[i, e] + x[i - 1, e] >= d[i - 1])
 
     problem = cp.Problem(objective, constraints)
-    problem.solve(solver=cp.CBC)
+    problem.solve(solver=cp.HIGHS)
 
     placement = [[int(x.value[s, e]) for e in range(num_clusters)] for s in range(num_nodes)]
     return placement
