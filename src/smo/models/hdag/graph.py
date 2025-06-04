@@ -1,7 +1,7 @@
 """Application graph."""
 
 from models import db
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import JSON
 
 
 class Graph(db.Model):
@@ -12,8 +12,8 @@ class Graph(db.Model):
     status = db.Column(db.String(255))
     project = db.Column(db.String(255))
     grafana = db.Column(db.String(255))
-    graph_descriptor = db.Column(JSONB)
-    placement = db.Column(JSONB)
+    graph_descriptor = db.Column(JSON)
+    placement = db.Column(JSON)
 
     services = db.relationship(
         'Service',

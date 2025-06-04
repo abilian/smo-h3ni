@@ -7,7 +7,7 @@ from kubernetes.utils import parse_quantity
 from utils.helpers import format_memory
 
 
-class KarmadaHelper():
+class KarmadaHelper:
     """Karmada helper class."""
 
     def __init__(self, config_file_path, namespace='default'):

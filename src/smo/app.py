@@ -18,11 +18,12 @@ from services.cluster.cluster_service import fetch_clusters
 
 env = os.environ.get('FLASK_ENV', 'development')
 
+ROOT_PATH = os.path.dirname(__file__)
+
 
 def create_app(app_name='smo'):
     """Function that returns a configured Flask app."""
 
-    ROOT_PATH = os.path.dirname(__file__)
     app = Flask(app_name, root_path=ROOT_PATH)
 
     app.config['SWAGGER'] = {
@@ -60,7 +61,6 @@ def create_app(app_name='smo'):
     app.register_blueprint(os_k8s)
     app.register_blueprint(vim)
 
-
     app.register_error_handler(
         subprocess.CalledProcessError,
         error_handlers.handle_subprocess_error
@@ -74,8 +74,11 @@ def create_app(app_name='smo'):
     with app.app_context():
         db.create_all()
         fetch_clusters(
-            app.config['KARMADA_KUBECONFIG'], app.config['SUBMARINER_KUBECONFIG'],
-            app.config['GRAFANA_HOST'], app.config['GRAFANA_USERNAME'], app.config['GRAFANA_PASSWORD']
+            app.config['KARMADA_KUBECONFIG'],
+            app.config['SUBMARINER_KUBECONFIG'],
+            app.config['GRAFANA_HOST'],
+            app.config['GRAFANA_USERNAME'],
+            app.config['GRAFANA_PASSWORD'],
         )
 
     return app

@@ -14,3 +14,7 @@ develop:
 update:
 	uv sync -U
 	uv pip list --outdated
+
+clean:
+	uv run adt clean
+

@@ -1,7 +1,7 @@
 """Application graph service node table."""
 
 from models import db
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import JSON
 
 
 class Service(db.Model):
@@ -19,8 +19,8 @@ class Service(db.Model):
     memory = db.Column(db.String(255))
     storage = db.Column(db.String(255))
     gpu = db.Column(db.String(255))
-    values_overwrite = db.Column(JSONB)
-    alert = db.Column(JSONB)
+    values_overwrite = db.Column(JSON)
+    alert = db.Column(JSON)
 
     graph = db.relationship('Graph', back_populates='services')
     graph_id = db.Column(

@@ -10,14 +10,18 @@ load_dotenv()
 def str_to_bool(str_variable):
     return str_variable.lower() in ('t', 'true')
 
+
 class Config:
     """Database connection credentials."""
-    SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:5432/{}'.format(
-        os.getenv('DB_USER', 'root'),
-        os.getenv('DB_PASSWORD', 'password'),
-        os.getenv('DB_HOST', 'localhost'),
-        os.getenv('DB_NAME', 'smo')
-    )
+    if 'FLASK_SQLALCHEMY_DATABASE_URI' in os.environ:
+        SQLALCHEMY_DATABASE_URI = os.environ['FLASK_SQLALCHEMY_DATABASE_URI']
+    else:
+        SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:5432/{}'.format(
+            os.getenv('DB_USER', 'root'),
+            os.getenv('DB_PASSWORD', 'password'),
+            os.getenv('DB_HOST', 'localhost'),
+            os.getenv('DB_NAME', 'smo')
+        )
     KARMADA_KUBECONFIG = '/home/python/.kube/{}'.format(
         os.getenv('KARMADA_KUBECONFIG', 'karmada-apiserver.config')
     )
