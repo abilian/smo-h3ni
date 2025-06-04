@@ -17,15 +17,12 @@ smo:
 
   script:
     - export PGPASSWORD=$POSTGRESQL_PASSWORD
-    # - export PATH=$HOME/.local/bin:$PATH
-    - sleep 4
+    - export PATH=/usr/local/bin:$PATH
     - pip install uv
-    # Install
-    #    - curl -LsSf https://astral.sh/uv/install.sh | sh
     - uv sync
     - uv run pytest
     # Smoke test for Flask app
     - cd src
-    - python app.py &> flask.log &
+    - uv run python app.py &> flask.log &
     - sleep 7
     - cat flask.log
