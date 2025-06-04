@@ -18,18 +18,18 @@ packages:
 tasks:
   - setup: |
       sudo pip install -U pip uv poetry nox
-      cd smo-fork
+      cd smo-h3ni
       uv sync
       uv run inv install
 
   - lint: |
-      cd smo-fork
+      cd smo-h3ni
       uv run make lint
 
   - test: |
-      cd smo-fork
+      cd smo-h3ni
       uv run inv test
 
   - nox: |
-      cd smo-fork
+      cd smo-h3ni
       uv run nox
