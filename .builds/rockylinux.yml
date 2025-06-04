@@ -26,22 +26,22 @@ packages:
 tasks:
   - setup: |
       sudo pip3.12 install -U uv nox
-      cd smo
+      cd smo-fork
       uv sync
 
   - lint: |
-      cd smo
+      cd smo-fork
       uv run make lint
 
   - test: |
-      cd smo
+      cd smo-fork
       uv run make test
 
   - nox: |
-      cd smo
+      cd smo-fork
       uv run nox -e pytest-3.12
       uv run nox -e pytest-3.11
 
   - buildah: |
-      cd smo
+      cd smo-fork
       buildah build -t smo .

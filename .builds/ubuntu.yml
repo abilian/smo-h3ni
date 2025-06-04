@@ -27,25 +27,25 @@ packages:
 tasks:
   - setup: |
       sudo pip install --break-system-packages -U uv nox
-      cd smo
+      cd smo-fork
       uv sync
 
   - lint: |
-      cd smo
+      cd smo-fork
       uv run make lint
 
   - test: |
-      cd smo
+      cd smo-fork
       uv run make test
 
   - nox: |
-      cd smo
+      cd smo-fork
       uv run nox -e pytest-3.12
 
   - buildah: |
-      cd smo
+      cd smo-fork
       buildah build -t smo .
 
   - docker-build: |
-      cd smo
+      cd smo-fork
       sudo docker build -t smo .
