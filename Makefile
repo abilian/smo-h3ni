@@ -18,3 +18,7 @@ update:
 clean:
 	uv run adt clean
 
+
+format-doc:
+	uv run markdown-toc -i README.md
+	uv run markdown-toc -i TODO.md

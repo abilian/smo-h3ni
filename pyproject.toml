@@ -51,6 +51,7 @@ dev = [
     "flake8",
     "mccabe",
     "devtools>=0.12.2",
+    "markdown-toc>=1.2.6",
 ]
 
 

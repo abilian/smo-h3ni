@@ -585,6 +585,18 @@ wheels = [
 ]
 
 [[package]]
+name = "markdown-toc"
+version = "1.2.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-dateutil" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/22/2e/a41b4efe2ffab22e7f1aeba325fb843117dce9386530ba7efa89c5c14b96/markdown-toc-1.2.6.tar.gz", hash = "sha256:8e89536688000c05b329df220e8036211c572af376cc83cee8763335711c19bd", size = 6718 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/86/9b/a2ef42a5a1bcba508afec04da982839681ee62fa9dded969692f3cbb7ae7/markdown_toc-1.2.6-py3-none-any.whl", hash = "sha256:63706ab4ccde4c82840f79197cefbcf47dc2a25582cf86187a83a9206cb38345", size = 8125 },
+]
+
+[[package]]
 name = "markupsafe"
 version = "3.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1442,6 +1454,7 @@ dependencies = [
 dev = [
     { name = "devtools" },
     { name = "flake8" },
+    { name = "markdown-toc" },
     { name = "mccabe" },
     { name = "pytest" },
     { name = "ruff" },
@@ -1465,6 +1478,7 @@ requires-dist = [
 dev = [
     { name = "devtools", specifier = ">=0.12.2" },
     { name = "flake8" },
+    { name = "markdown-toc", specifier = ">=1.2.6" },
     { name = "mccabe" },
     { name = "pytest" },
     { name = "ruff" },

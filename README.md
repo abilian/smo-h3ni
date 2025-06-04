@@ -3,6 +3,26 @@
 > This is a forked version of the original Nephele SMO repository. The original repository is located at: https://gitlab.eclipse.org/eclipse-research-labs/nephele-project/smo
 > This is a work in progress. The development plan is outlined in the [TODO.md](./TODO.md) file.
 
+Build status: [![builds.sr.ht status](https://builds.sr.ht/~sfermigier/smo-h3ni.svg)](https://builds.sr.ht/~sfermigier/smo-h3ni?)
+
+
+## TOC
+
+<!-- toc -->
+
+- [Prerequisites](#prerequisites)
+- [Getting started](#getting-started)
+- [Container/Artifact registry](#containerartifact-registry)
+  * [Docker container images](#docker-container-images)
+    + [Docker settings](#docker-settings)
+    + [Containerd (Kubernetes) settings](#containerd-kubernetes-settings)
+  * [OCI artifacts](#oci-artifacts)
+- [Full example](#full-example)
+- [File structure](#file-structure)
+- [NFVCL API](#nfvcl-api)
+
+<!-- tocstop -->
+
 ---
 
 (Original README below)

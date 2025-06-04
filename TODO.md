@@ -2,6 +2,22 @@
 
 Here are the refactorings and enhancements for the SMO codebase planned or envisioned to achieve the H3NI project's goals successfully.
 
+<!-- toc -->
+
+- [Quick changelog and task list](#quick-changelog-and-task-list)
+  * [DONE](#done)
+  * [Roadmap / Started](#roadmap--started)
+  * [Roadmap / TODO](#roadmap--todo)
+  * [Roadmap / Long-term](#roadmap--long-term)
+- [Detailed discussion](#detailed-discussion)
+  * [0. Starting point](#0-starting-point)
+  * [1. Foundational Refactorings](#1-foundational-refactorings)
+  * [2. New SMO Refactorings/Enhancements Driven Directly by H3NI Functionalities](#2-new-smo-refactoringsenhancements-driven-directly-by-h3ni-functionalities)
+  * [Already Done](#already-done)
+  * [Summary](#summary)
+
+<!-- tocstop -->
+
 ## Quick changelog and task list
 
 Starting point = the orignal repository ([commit 6590688b51b6487da414b4d80598e57594954593](https://gitlab.eclipse.org/eclipse-research-labs/nephele-project/smo/-/tree/6590688b51b6487da414b4d80598e57594954593))
