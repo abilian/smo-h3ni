@@ -38,7 +38,8 @@ def deploy_graph(project, graph_descriptor):
     """
 
     grafana_helper = GrafanaHelper(
-        current_app.config['GRAFANA_HOST'], current_app.config['GRAFANA_USERNAME'],
+        current_app.config['GRAFANA_HOST'],
+        current_app.config['GRAFANA_USERNAME'],
         current_app.config['GRAFANA_PASSWORD']
     )
     prom_helper = PrometheusHelper(current_app.config['PROMETHEUS_HOST'])

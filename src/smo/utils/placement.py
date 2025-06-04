@@ -23,33 +23,6 @@ class PlacementError(ValueError):
     pass
 
 
-def swap_placement(service_to_cluster: dict[str, str]) -> dict[str, list[str]]:
-    """
-    Inverts a service-to-cluster mapping.
-
-    Takes a dictionary mapping each service to its assigned cluster and
-    returns a dictionary mapping each cluster to a list of services
-    deployed on it.
-
-    Parameters
-    ----------
-    service_to_cluster : dict
-        A dictionary where keys are service identifiers and values are
-        their assigned cluster identifiers.
-
-    Returns
-    -------
-    dict
-        A dictionary where keys are cluster identifiers and values are
-        lists of service identifiers deployed on that cluster.
-    """
-
-    cluster_dict = {}
-    for key, value in service_to_cluster.items():
-        cluster_dict.setdefault(value, []).append(key)
-    return cluster_dict
-
-
 def convert_placement(
     placement_matrix: list[list[int]],
     services_info: list[dict[str, Any]],
@@ -268,3 +241,31 @@ def calculate_naive_placement(
             raise PlacementError(msg)
 
     return placement
+
+
+def swap_placement(service_to_cluster: dict[str, str]) -> dict[str, list[str]]:
+    """
+    Inverts a service-to-cluster mapping.
+
+    Takes a dictionary mapping each service to its assigned cluster and
+    returns a dictionary mapping each cluster to a list of services
+    deployed on it.
+
+    Parameters
+    ----------
+    service_to_cluster : dict
+        A dictionary where keys are service identifiers and values are
+        their assigned cluster identifiers.
+
+    Returns
+    -------
+    dict
+        A dictionary where keys are cluster identifiers and values are
+        lists of service identifiers deployed on that cluster.
+    """
+
+    cluster_dict = {}
+    for key, value in service_to_cluster.items():
+        cluster_dict.setdefault(value, []).append(key)
+    return cluster_dict
+
