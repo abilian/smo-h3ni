@@ -19,6 +19,8 @@ smo:
     - export PGPASSWORD=$POSTGRESQL_PASSWORD
     - export PATH=/usr/local/bin:$PATH
     - pip install uv
+    # Temp (debug)
+    - find / -name uv
     - /usr/local/bin/uv sync
     - /usr/local/bin/uv run pytest
     # Smoke test for Flask app
