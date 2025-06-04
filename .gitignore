@@ -1,3 +1,8 @@
+### Local / Secret Files ###
+.envrc
+.env
+/sandbox
+
 ### Flask ###
 instance/*
 !instance/.gitignore
