@@ -2,11 +2,69 @@
 
 Here are the refactorings and enhancements for the SMO codebase planned or envisioned to achieve the H3NI project's goals successfully.
 
-## 0. Starting point
+## Quick changelog and task list
+
+Starting point = the orignal repository ([commit 6590688b51b6487da414b4d80598e57594954593](https://gitlab.eclipse.org/eclipse-research-labs/nephele-project/smo/-/tree/6590688b51b6487da414b4d80598e57594954593))
+
+### DONE
+
+- [x] Introduce SMO-specific namespace for better organization.
+- [x] Add basic unit tests for functionality validation.
+- [x] Create a CI pipeline on SourceHut.
+- [x] Introduce a `Makefile` to streamline hypermodern Python development workflows (e.g., testing, linting, formatting).
+
+### Roadmap / Started
+
+- [ ] Refactor codebase for readability and maintainability.
+- [ ] Add SQLite support for database flexibility.
+- [ ] Implement static analysis and enforce consistent formatting.
+- [ ] Update documentation for usage and contribution guidelines (README)
+- [ ] Extend test capabilities to include runtime type-checking with tools like **Typeguard** and **Beartype**.
+- [ ] Add support for local development with **Vagrant**.
+- [ ] Implement a basic CLI for interacting with the SMO API.
+- [ ] Generate a SBOM for the project.
+- [ ] refact: Refactor using a layered architecture.
+- [ ] type: Add type hints to all functions and methods.
+
+### Roadmap / TODO
+
+- [ ] fix: Work around the `hdarctl` dependency issue.
+- [ ] test: Add more unit tests in order to reach close to 100% coverage.
+- [ ] test: Add integration tests.
+- [ ] test: Add e2e tests.
+- [ ] test: test Swagger API using [Schemathesis](https://github.com/schemathesis/schemathesis?tab=readme-ov-file) (and/or [Bravado](https://pypi.org/project/pytest-bravado/)). (But not Dredd - Dredd is dead, killed by Oracle)
+- [ ] feature: Improve error handling and logging.
+- [ ] refact: use the modern (2.0) SQLAlchemy ORM API.
+- [ ] feature: Implement a proper configuration management.
+- [ ] feature: Implement a dependency injection mechanism.
+- [ ] feature: Implement an extension mechanism (e.g. `pluggy` or similar).
+- [ ] refact: Replace the Gurobi Optimizer with an [open-source alternative](https://lab.abilian.com/Tech/Programming%20Techniques/Optimization/)
+- [ ] lint: Fix / suppress all linting issues (ruff, flake8).
+- [ ] lint: Resolve all type-checking issues (mypy, pyright, typeguard, beartype).
+- [ ] doc: Introduce a Changelog (and tools to manage it, like `towncryer` or similar).
+- [ ] doc: Create a proper documentation site using Portray or MkDocs (cf. <https://lab.abilian.com/Tech/Python/Tooling/Documentation/>)
+- [ ] doc: Describe python API using a formalized format (cf. <https://lab.abilian.com/Tech/Python/Tooling/Documenting%20a%20Python%20API/>)
+- [ ] chore: Add a license compliance report (and double-check REUSE config).
+
+### Roadmap / Long-term
+
+- [ ] refact: make the optimizer pluggable.
+- [ ] feat: make the orchestration backend-end (current, Kubernetes) pluggable.
+- [ ] refact: make the orchestrator pluggable.
+- [ ] feat: create plugins for other orchestrators: Nomad, Docker Swarm, OpenNebula, Hop3 (when it's ready), etc.
+- [ ] feat: Make a Web UI.
+- [ ] refact: Make the optimisation algorithm pluggable.
+- [ ] feat: Create and benchmark alternative optimisation algorithms.
+- ...
+
+
+## Detailed discussion
+
+### 0. Starting point
 
 See [Codebase Tour](./notes/codebase-tour.md).
 
-## 1. Foundational Refactorings
+### 1. Foundational Refactorings
 
 See [Refactoring Plan](./notes/refactoring-plan.md).
 
@@ -40,7 +98,7 @@ More specifically:
     *   **SMO Impact:** Important for robust integration.
 
 
-## 2. New SMO Refactorings/Enhancements Driven Directly by H3NI Functionalities
+### 2. New SMO Refactorings/Enhancements Driven Directly by H3NI Functionalities
 
 Here's a list of areas where the SMO's current capabilities need to be extended or significantly modified:
 
@@ -89,13 +147,13 @@ Here's a list of areas where the SMO's current capabilities need to be extended 
         *   This might involve a new optimization model or heuristics.
         *   The interaction between horizontal and vertical scaling needs careful design.
 
-## Already Done
+### Already Done
 
 1.  **Integration with Open-Source Solvers:**
     *   **H3NI Relevance:** "H3NI Orchestration Mechanisms" lists "Open-Source Solvers", and "Replace any proprietary optimization solvers with open-source alternatives".
     * This has been done in Q2 2025 by the NEPHELE Team so not our (Abilian) concern. Tests need to be updated though.
 
-## Summary
+### Summary
 
 This plan pushes SMO to become a more generic, configurable, and extensible orchestration *framework*, where the H3NI plugins will provide specialized intelligence and control mechanisms that leverage and enhance SMO's core capabilities, when integrated with Hop3.
 
