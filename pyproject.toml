@@ -50,6 +50,7 @@ dev = [
     "ruff",
     "flake8",
     "mccabe",
+    "devtools>=0.12.2",
 ]
 
 
