@@ -52,6 +52,7 @@ dev = [
     "mccabe",
     "devtools>=0.12.2",
     "markdown-toc>=1.2.6",
+    "coverage>=7.8.2",
 ]
 
 
