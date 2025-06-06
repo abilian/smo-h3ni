@@ -341,14 +341,15 @@ def get_descriptor_from_artifact(project, artifact_ref):
     """
 
     with tempfile.TemporaryDirectory() as dirpath:
+	# fmt: off
         subprocess.run([
             'hdarctl',
             'pull',
             artifact_ref,
             '--untar',
-            '--destination',
-            dirpath
+            '--destination', dirpath
         ])
+	# fmt: on
 
         for (root, dirs, files) in walk(dirpath):
             for file in files:
@@ -364,19 +365,19 @@ def helm_install_artifact(name, artifact_ref, values_overwrite, namespace, comma
     with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml') as values_file:
         yaml.dump(values_overwrite, values_file)
 
+	# fmt: off
         subprocess_arguments = [
             'helm',
             command,
             name,
             artifact_ref,
-            '--values',
-            values_file.name,
-            '--namespace',
-            namespace,
+            '--values', values_file.name,
+            '--namespace', namespace,
             '--create-namespace',
-            '--kubeconfig',
-            current_app.config['KARMADA_KUBECONFIG']
+            '--kubeconfig', current_app.config['KARMADA_KUBECONFIG']
         ]
+        # fmt: on
+
         if current_app.config['INSECURE_REGISTRY']:
             subprocess_arguments.append('--plain-http')
         if command == 'upgrade':
@@ -391,16 +392,17 @@ def helm_uninstall_graph(services, namespace):
         if service.alert != {}:
             prom_helper = PrometheusHelper(current_app.config['PROMETHEUS_HOST'])
             prom_helper.update_alert_rules(service.alert, 'remove')
+
         if service.status == 'Deployed':
+	    # fmt: off
             subprocess.run([
                 'helm',
                 'uninstall',
                 service.name,
-                '--namespace',
-                namespace,
-                '--kubeconfig',
-                current_app.config['KARMADA_KUBECONFIG']
+                '--namespace', namespace,
+                '--kubeconfig', current_app.config['KARMADA_KUBECONFIG']
             ])
+	    # fmt: on
 
 
 def spawn_scaling_processes(graph_name, cluster_placement):

@@ -7,6 +7,14 @@ from smo.utils.placement import (convert_placement, decide_placement,
 from . import constant as c
 
 
+def test_swap_placement():
+    service_dict = {"service1": "cluster1", "service2": "cluster1"}
+    expected = {"cluster1": ["service1", "service2"]}
+
+    result = swap_placement(service_dict)
+    assert result == expected
+
+
 def test_convert_placement():
     placement = [[1, 0], [1, 0]]
     services = [{"id": "service1"}, {"id": "service2"}]
@@ -15,14 +23,6 @@ def test_convert_placement():
     expected = {"service1": "cluster1", "service2": "cluster1"}
 
     result = convert_placement(placement, services, clusters)
-    assert result == expected
-
-
-def test_swap_placement():
-    service_dict = {"service1": "cluster1", "service2": "cluster1"}
-    expected = {"cluster1": ["service1", "service2"]}
-
-    result = swap_placement(service_dict)
     assert result == expected
 
 
