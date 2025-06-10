@@ -74,15 +74,17 @@ def deploy_graph(project, graph_descriptor):
     cluster_acceleration = {cluster.name: cluster.acceleration for cluster in available_clusters}
     cluster_capacity_list = [value for value in cluster_capacity.values()]
     cluster_acceleration_list = [value for value in cluster_acceleration.values()]
-    placement = calculate_naive_placement(
-        cluster_capacity_list, cluster_acceleration_list, cpu_limits, acceleration_list, replicas
-    )
-    graph.placement = placement
 
+    service_placement = {}
+    if not hdag_config['hdaGraphIntent']['useStaticPlacement']:
+        placement = calculate_naive_placement(
+            cluster_capacity_list, cluster_acceleration_list, cpu_limits, acceleration_list, replicas
+        )
+        graph.placement = placement
 
-    service_placement = convert_placement(placement, services, cluster_list)
-    cluster_placement = swap_placement(service_placement)
-    import_clusters = create_service_imports(services, service_placement)
+        service_placement = convert_placement(placement, services, cluster_list)
+        cluster_placement = swap_placement(service_placement)
+        import_clusters = create_service_imports(services, service_placement)
 
     svc_names = []
     for service in services:
@@ -118,13 +120,14 @@ def deploy_graph(project, graph_descriptor):
         storage = tranlsate_storage(service['deployment']['intent']['compute']['storage'])
         gpu = 1 if service['deployment']['intent']['compute']['gpu']['enabled'] == 'True' else 0
 
-        if implementer == 'WOT':
-            if 'voChartOverwrite' not in values_overwrite:
-                values_overwrite['voChartOverwrite'] = {}
-            placement_dict = values_overwrite['voChartOverwrite']
+        if not hdag_config['hdaGraphIntent']['useStaticPlacement']:
+            if implementer == 'WOT':
+                if 'voChartOverwrite' not in values_overwrite:
+                    values_overwrite['voChartOverwrite'] = {}
+                placement_dict = values_overwrite['voChartOverwrite']
 
-        placement_dict['clustersAffinity'] = [service_placement[name]]
-        placement_dict['serviceImportClusters'] = import_clusters[name]
+            placement_dict['clustersAffinity'] = [service_placement[name]]
+            placement_dict['serviceImportClusters'] = import_clusters[name]
 
         status = 'Pending' if conditional_deployment else 'Deployed'
 
@@ -132,12 +135,13 @@ def deploy_graph(project, graph_descriptor):
         response = grafana_helper.publish_dashboard(svc_dashboard)
         grafana_url = f'{current_app.config["GRAFANA_HOST"]}{response["url"]}'
 
+        cluster_affinity = service_placement[name] if name in service_placement else None
         svc = Service(
             name=name,
             values_overwrite=values_overwrite,
             graph_id=graph.id,
             status=status,
-            cluster_affinity=service_placement[name],
+            cluster_affinity=cluster_affinity,
             artifact_ref=artifact_ref,
             artifact_type=artifact_type,
             artifact_implementer=implementer,
@@ -282,8 +286,8 @@ def remove_graph(name):
         raise NotFound(f'Graph with name {name} not found')
 
     helm_uninstall_graph(graph.services, graph.project)
-    for stop_event in stop_events[name]:
-        stop_event.set()
+    #for stop_event in stop_events[name]:
+    #    stop_event.set()
 
     db.session.delete(graph)
     db.session.commit()

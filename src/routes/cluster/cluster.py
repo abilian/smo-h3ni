@@ -14,7 +14,7 @@ def get_clusters():
     """Fetches all Bare-metal Kubernetes clusters."""
 
     clusters = fetch_clusters(
-        current_app.config['KARMADA_KUBECONFIG'], current_app.config['SUBMARINER_KUBECONFIG'],
+        current_app.config['KARMADA_KUBECONFIG'],
         current_app.config['GRAFANA_HOST'], current_app.config['GRAFANA_USERNAME'], current_app.config['GRAFANA_PASSWORD']
     )
     return clusters, 200

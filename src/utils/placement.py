@@ -151,3 +151,37 @@ def calculate_naive_placement(cluster_capacities, cluster_accelerations, cpu_lim
             raise ValueError(f'Service {service_id} with requirement {service_req} could not be placed in any cluster.')
 
     return placement
+
+
+# Input data
+cluster_capacities = [4, 8]
+cluster_accelerations = [0, 0]
+cpu_limits = [1, 1, 1]
+accelerations = [0, 0, 0]
+replicas = [1, 2, 3]
+current_placement = [
+    [0, 1],  # service 0 on cluster 0
+    [0, 1],  # service 1 on cluster 1
+    [0, 1]   # service 2 on cluster 1
+]
+
+# Function calls
+placement = decide_placement(
+    cluster_capacities,
+    cluster_accelerations,
+    cpu_limits,
+    accelerations,
+    replicas,
+    current_placement
+)
+print(f"Placement: {placement}")
+
+naive_placement = calculate_naive_placement(
+    cluster_capacities,
+    cluster_accelerations,
+    cpu_limits,
+    accelerations,
+    replicas
+)
+print(f"Naive Placement: {naive_placement}")
+

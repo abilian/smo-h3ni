@@ -11,8 +11,6 @@ class Cluster(db.Model):
     available_ram = db.Column(db.String, nullable=False)
     availability = db.Column(db.Boolean, nullable=False)
     acceleration = db.Column(db.Boolean, nullable=False)
-    pod_cidr = db.Column(db.String(100))
-    service_cidr = db.Column(db.String(100))
     grafana = db.Column(db.String)
 
 
@@ -27,7 +25,5 @@ class Cluster(db.Model):
             'available_ram': self.available_ram,
             'availability': self.availability,
             'acceleration': self.acceleration,
-            'pod_cidr': self.pod_cidr,
-            'service_cidr': self.service_cidr,
             'grafana': self.grafana
         }

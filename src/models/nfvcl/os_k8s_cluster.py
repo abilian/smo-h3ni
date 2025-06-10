@@ -22,7 +22,6 @@ class OS_K8S_cluster(db.Model):
     service_network = db.Column(db.String(100))
     running_workers = db.Column(db.Integer)
     karmada_details = db.Column(db.JSON)    # Something about Karmada
-    submariner_details = db.Column(db.JSON)  # Something about Submariner
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
