@@ -61,6 +61,9 @@ dev = [
 ]
 
 
+[project.scripts]
+smo = "smo.cli:main"
+
 #description = "Add your description here"
 #readme = "README.md"
 #authors = [
