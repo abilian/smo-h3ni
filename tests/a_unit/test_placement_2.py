@@ -1,3 +1,6 @@
+# ruff: noqa: PLC0206
+
+from __future__ import annotations
 import pytest
 
 from smo.utils import placement

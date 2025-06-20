@@ -1,7 +1,8 @@
+from __future__ import annotations
 from devtools import debug
 from py_pglite.sqlalchemy import SQLAlchemyPGliteManager
 
-from smo.app import create_app
+from smo.flask.app import create_app
 
 
 def test_app():
