@@ -35,6 +35,11 @@ update:
 clean:
 	uv run adt clean
 
+## Format
+format:
+	uv run isort src tests
+	uv run black src tests
+	uv run ruff format src tests
 
 ## Format documentation files
 format-doc:
