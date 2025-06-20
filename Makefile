@@ -69,16 +69,18 @@ generate-sbom:
 	uv sync -q --no-dev
 	uv pip list --format=freeze > compliance/requirements-prod.txt
 	uv sync -q
-	# CycloneDX
+	# Convert prod reqs to SBOM (CycloneDX format)
 	uv run cyclonedx-py requirements \
-			--pyproject pyproject.toml -o compliance/sbom-cyclonedx.json \
+			--pyproject pyproject.toml \
+			-o compliance/sbom-cyclonedx.json \
 			compliance/requirements-prod.txt
 	# Add license information
 	uv run lbom \
-			--input_file compliance/sbom-cyclonedx.json \
-			> compliance/sbom-lbom.json
+		--input_file compliance/sbom-cyclonedx.json \
+		--output_file compliance/sbom-lbom.json
 	mv compliance/sbom-lbom.json compliance/sbom-cyclonedx.json
-	# broken
+
+	# Broken:
 	#       # SPDX
 	#       sbom4python -r compliance/requirements-prod.txt \
 	#               --sbom spdx --format json \
