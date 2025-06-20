@@ -29,24 +29,24 @@ Starting point = the orignal repository ([commit 6590688b51b6487da414b4d80598e57
 - [x] Create a CI pipeline on SourceHut.
 - [x] Introduce a `Makefile` to streamline hypermodern Python development workflows (e.g., testing, linting, formatting).
 - [x] Refact: Refactor codebase for readability and maintainability.
-- [x] Test: Integration tests with py-pglite
+- [x] Test: Basic integration tests with py-pglite
 - [x] Compliance: Add licencing check using REUSE
 - [x] Compliance: generate a SBOM
 - [x] Implement static analysis (ruff) and enforce consistent formatting.
-- [x] DX: Add support for local development with **Vagrant**.
+- [x] DX: Add support for local development with Vagrant.
+- [x] Test: Extend test capabilities to include runtime type-checking Beartype.
+- [x] Doc: Introduce a Changelog
+- [x] Refact: Refactor using a layered architecture.
 
 ### Roadmap / Started
 
 - [ ] Feat: Add SQLite support for database flexibility.
 - [ ] Doc: Update documentation for usage and contribution guidelines (README)
-- [ ] Test: Extend test capabilities to include runtime type-checking with tools like **Typeguard** and **Beartype**.
 - [ ] Feat: Implement a basic CLI for interacting with the SMO API.
-- [ ] Refact: Refactor using a layered architecture.
 - [ ] Type: Add type hints to all functions and methods.
 
 ### Roadmap / TODO
 
-- [ ] fix: Work around the `hdarctl` dependency issue.
 - [ ] test: Add more unit tests in order to reach close to 100% coverage.
 - [ ] test: Add integration tests.
 - [ ] test: Add e2e tests.
@@ -56,9 +56,9 @@ Starting point = the orignal repository ([commit 6590688b51b6487da414b4d80598e57
 - [ ] feature: Implement a proper configuration management.
 - [ ] feature: Implement a dependency injection mechanism.
 - [ ] feature: Implement an extension mechanism (e.g. `pluggy` or similar).
-- [ ] doc: Introduce a Changelog
 - [ ] doc: Create a proper documentation site using Portray or MkDocs (cf. <https://lab.abilian.com/Tech/Python/Tooling/Documentation/>)
 - [ ] doc: Describe python API using a formalized format (cf. <https://lab.abilian.com/Tech/Python/Tooling/Documenting%20a%20Python%20API/>)
+- [ ] fix: Work around the `hdarctl` dependency issue.
 
 ### Roadmap / Long-term
 
