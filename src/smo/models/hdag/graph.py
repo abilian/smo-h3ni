@@ -26,8 +26,7 @@ class Graph(db.Model):
             "project": self.project,
             "grafana": self.grafana,
             "hdaGraph": self.graph_descriptor,
+            "services": [service.to_dict() for service in self.services],
         }
-
-        instance_dict["services"] = [service.to_dict() for service in self.services]
 
         return instance_dict
