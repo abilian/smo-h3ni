@@ -65,6 +65,18 @@ push-code:
 
 ## Generate Software Bill of Materials (SBOM) for CRA compliance
 generate-sbom:
+	@echo "--> Generating SBOM (assuming syft is installed)"
+	make clean
+	uv sync -q --no-dev
+	syft . \
+		-o spdx-json=compliance/sbom-spdx.json \
+		-o cyclonedx-json=compliance/sbom-cyclonedx.json \
+		-o syft-text=compliance/sbom-syft.txt
+	npx prettier -w compliance/sbom-spdx.json
+	npx prettier -w compliance/sbom-cyclonedx.json
+	uv sync -q
+
+generate-sbom-old:
 	@echo "--> Generating SBOM"
 	uv sync -q --no-dev
 	uv pip list --format=freeze > compliance/requirements-prod.txt
