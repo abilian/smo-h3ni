@@ -16,7 +16,8 @@ smo:
       alias: postgres
 
   script:
-    - sudo apt-get install -y npm
+    - apt-get update
+    - apt-get install -y npm
     - export PGPASSWORD=$POSTGRESQL_PASSWORD
     - export PATH=/builds/.local/bin:$PATH
     - pip install uv
