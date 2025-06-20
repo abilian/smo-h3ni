@@ -23,6 +23,24 @@ Build status: [![builds.sr.ht status](https://builds.sr.ht/~sfermigier/smo-h3ni.
 
 <!-- tocstop -->
 
+## REUSE Licence Check
+
+```
+# SUMMARY
+
+* Bad licenses: 0
+* Deprecated licenses: 0
+* Licenses without file extension: 0
+* Missing licenses: 0
+* Unused licenses: 0
+* Used licenses: MIT, CC-BY-4.0, BSD-3-Clause
+* Read errors: 0
+* Files with copyright information: 123 / 123
+* Files with license information: 123 / 123
+
+Congratulations! Your project is compliant with version 3.3 of the REUSE Specification :-)
+```
+
 ---
 
 (Original README below)

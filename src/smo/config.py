@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def str_to_bool(str_variable, default: bool | None = None) -> bool:
+def str_to_bool(str_variable, default: bool | None = None) -> bool:  # noqa: FBT001
     if str_variable is None:
         if default is not None:
             return default

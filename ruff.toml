@@ -55,6 +55,8 @@ lint.extend-ignore = [
     "B909", # Mutation to loop iterable during iteration
     "S704", # Unsafe use of Markup
     "RUF039", # First argument to `re.search()` is not raw string
+    "PERF401", # Use list comprehensions / list.extend
+    "F841", # Local variable ... is assigned to but never used
 
     # Fix
     "B007", # Loop control variable `dirs` not used within loop body
@@ -78,6 +80,9 @@ lint.extend-ignore = [
     "UP015", # [*] Unnecessary open mode parameters
     "UP030", # Use implicit references for positional format fields
     "UP032", # [*] Use f-string instead of `format` call
+    "PLR2004", # Magic value
+    "TRY301", # Abstract `raise` to an inner function
+    "EM101", # Exception must not use an f-string literal, assign to variable first
 ]
 
 

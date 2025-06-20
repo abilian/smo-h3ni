@@ -31,9 +31,10 @@ Starting point = the orignal repository ([commit 6590688b51b6487da414b4d80598e57
 
 ### Roadmap / Started
 
-- [ ] Refactor codebase for readability and maintainability.
+- [x] Refactor codebase for readability and maintainability.
+- [x] Integration tests with py-pglite
 - [ ] Add SQLite support for database flexibility.
-- [ ] Implement static analysis and enforce consistent formatting.
+- [x] Implement static analysis and enforce consistent formatting.
 - [ ] Update documentation for usage and contribution guidelines (README)
 - [ ] Extend test capabilities to include runtime type-checking with tools like **Typeguard** and **Beartype**.
 - [ ] Add support for local development with **Vagrant**.
