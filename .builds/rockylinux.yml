@@ -15,6 +15,7 @@ packages:
   # Build tools
   - make
   - gcc
+  - npm
   # Libraries
   - libpq-devel
   # Docker and friends (NB: docker is not available on Rocky Linux)
