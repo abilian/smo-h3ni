@@ -1,154 +1,4 @@
-[Path: .]
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[Simple Launcher]
- Version:	 1.1.0.14
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
+[Path: .venv]
 [attrs]
  Version:	 25.3.0
  Type:		 python
@@ -156,26 +6,6 @@
 
 [autocommand]
  Version:	 2.2.2
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[autocommand]
- Version:	 2.2.2
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[autocommand]
- Version:	 2.2.2
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[backports-tarfile]
- Version:	 1.2.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[backports-tarfile]
- Version:	 1.2.0
  Type:		 python
  Found by:	 python-installed-package-cataloger
 
@@ -219,52 +49,12 @@
  Type:		 binary
  Found by:	 pe-binary-package-cataloger
 
-[cli]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[cli]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[cli-32]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[cli-32]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
 [cli-32]
  Version:	 UNKNOWN
  Type:		 binary
  Found by:	 pe-binary-package-cataloger
 
 [cli-64]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[cli-64]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[cli-64]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[cli-arm64]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[cli-arm64]
  Version:	 UNKNOWN
  Type:		 binary
  Found by:	 pe-binary-package-cataloger
@@ -314,52 +104,12 @@
  Type:		 binary
  Found by:	 pe-binary-package-cataloger
 
-[gui]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[gui]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[gui-32]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[gui-32]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
 [gui-32]
  Version:	 UNKNOWN
  Type:		 binary
  Found by:	 pe-binary-package-cataloger
 
 [gui-64]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[gui-64]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[gui-64]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[gui-arm64]
- Version:	 UNKNOWN
- Type:		 binary
- Found by:	 pe-binary-package-cataloger
-
-[gui-arm64]
  Version:	 UNKNOWN
  Type:		 binary
  Found by:	 pe-binary-package-cataloger
@@ -384,26 +134,6 @@
  Type:		 python
  Found by:	 python-installed-package-cataloger
 
-[importlib-metadata]
- Version:	 8.0.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[importlib-metadata]
- Version:	 8.0.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[inflect]
- Version:	 7.3.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[inflect]
- Version:	 7.3.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
 [inflect]
  Version:	 7.3.1
  Type:		 python
@@ -419,26 +149,6 @@
  Type:		 python
  Found by:	 python-installed-package-cataloger
 
-[jaraco-collections]
- Version:	 5.1.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[jaraco-collections]
- Version:	 5.1.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[jaraco-context]
- Version:	 5.3.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[jaraco-context]
- Version:	 5.3.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
 [jaraco-context]
  Version:	 5.3.0
  Type:		 python
@@ -446,26 +156,6 @@
 
 [jaraco-functools]
  Version:	 4.0.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[jaraco-functools]
- Version:	 4.0.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[jaraco-functools]
- Version:	 4.0.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[jaraco-text]
- Version:	 3.12.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[jaraco-text]
- Version:	 3.12.1
  Type:		 python
  Found by:	 python-installed-package-cataloger
 
@@ -514,26 +204,6 @@
  Type:		 python
  Found by:	 python-installed-package-cataloger
 
-[more-itertools]
- Version:	 10.3.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[more-itertools]
- Version:	 10.3.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[my-test-package]
- Version:	 1.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[my-test-package]
- Version:	 1.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
 [my-test-package]
  Version:	 1.0
  Type:		 python
@@ -560,52 +230,7 @@
  Found by:	 python-installed-package-cataloger
 
 [packaging]
- Version:	 24.2
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[packaging]
- Version:	 24.2
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[packaging]
  Version:	 25.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[pip]
- Version:	 25.1.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[pip]
- Version:	 25.1.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[pip]
- Version:	 25.1.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[pip]
- Version:	 25.1.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[pip]
- Version:	 25.1.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[platformdirs]
- Version:	 4.2.2
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[platformdirs]
- Version:	 4.2.2
  Type:		 python
  Found by:	 python-installed-package-cataloger
 
@@ -690,16 +315,6 @@
  Found by:	 python-installed-package-cataloger
 
 [setuptools]
- Version:	 80.3.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[setuptools]
- Version:	 80.3.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[setuptools]
  Version:	 80.9.0
  Type:		 python
  Found by:	 python-installed-package-cataloger
@@ -724,38 +339,8 @@
  Type:		 python
  Found by:	 python-installed-package-cataloger
 
-[tomli]
- Version:	 2.0.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[tomli]
- Version:	 2.0.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
 [typeguard]
  Version:	 4.3.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[typeguard]
- Version:	 4.3.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[typeguard]
- Version:	 4.3.0
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[typing-extensions]
- Version:	 4.12.2
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[typing-extensions]
- Version:	 4.12.2
  Type:		 python
  Found by:	 python-installed-package-cataloger
 
@@ -786,36 +371,6 @@
 
 [wheel]
  Version:	 0.45.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[wheel]
- Version:	 0.45.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[wheel]
- Version:	 0.45.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[wheel]
- Version:	 0.45.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[wheel]
- Version:	 0.45.1
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[zipp]
- Version:	 3.19.2
- Type:		 python
- Found by:	 python-installed-package-cataloger
-
-[zipp]
- Version:	 3.19.2
  Type:		 python
  Found by:	 python-installed-package-cataloger
 

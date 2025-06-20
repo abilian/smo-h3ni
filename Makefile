@@ -63,37 +63,16 @@ push-code:
 	git push sourcehut h3ni
 
 
-## Generate Software Bill of Materials (SBOM) for CRA compliance
+## Generate Software Bill of Materials (SBOM) from venv for CRA compliance
 generate-sbom:
 	@echo "--> Generating SBOM (assuming syft is installed)"
 	make clean
 	uv sync -q --no-dev
-	syft . \
+	uv pip list --format=freeze > compliance/requirements-prod.txt
+	syft .venv \
 		-o spdx-json=compliance/sbom-spdx.json \
 		-o cyclonedx-json=compliance/sbom-cyclonedx.json \
 		-o syft-text=compliance/sbom-syft.txt
 	npx prettier -w compliance/sbom-spdx.json
 	npx prettier -w compliance/sbom-cyclonedx.json
 	uv sync -q
-
-generate-sbom-old:
-	@echo "--> Generating SBOM"
-	uv sync -q --no-dev
-	uv pip list --format=freeze > compliance/requirements-prod.txt
-	uv sync -q
-	# Convert prod reqs to SBOM (CycloneDX format)
-	uv run cyclonedx-py requirements \
-			--pyproject pyproject.toml \
-			-o compliance/sbom-cyclonedx.json \
-			compliance/requirements-prod.txt
-	# Add license information
-	uv run lbom \
-		--input_file compliance/sbom-cyclonedx.json \
-		--output_file compliance/sbom-lbom.json
-	mv compliance/sbom-lbom.json compliance/sbom-cyclonedx.json
-
-	# Broken:
-	#       # SPDX
-	#       sbom4python -r compliance/requirements-prod.txt \
-	#               --sbom spdx --format json \
-	#               -o compliance/sbom-spdx.json
