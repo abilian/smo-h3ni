@@ -11,6 +11,10 @@ help:
 test:
 	uv run pytest
 
+## Test with Beartype
+test-beartype:
+	uv run pytest --beartype-packages=smo
+
 
 ## Alias for checking code quality
 lint: check
