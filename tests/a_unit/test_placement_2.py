@@ -1,4 +1,5 @@
 import pytest
+
 from smo.utils import placement
 from smo.utils.placement import PlacementError
 

@@ -3,7 +3,8 @@ from __future__ import annotations
 import pytest
 
 from smo.utils.placement import convert_placement, decide_placement, swap_placement
-from . import constant as c
+
+from tests.a_unit import constants as c
 
 
 def test_swap_placement():
