@@ -15,9 +15,10 @@ smo:
     - name: quay.io/sclorg/postgresql-15-c9s
       alias: postgres
 
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq npm
+
   script:
-    - apt-get update
-    - apt-get install -y npm
     - export PGPASSWORD=$POSTGRESQL_PASSWORD
     - export PATH=/builds/.local/bin:$PATH
     - pip install uv
