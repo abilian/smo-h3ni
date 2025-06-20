@@ -8,50 +8,53 @@ load_dotenv()
 
 
 def str_to_bool(str_variable):
-    return str_variable.lower() in ('t', 'true')
+    return str_variable.lower() in ("t", "true")
 
 
 class Config:
     """Database connection credentials."""
-    if 'FLASK_SQLALCHEMY_DATABASE_URI' in os.environ:
-        SQLALCHEMY_DATABASE_URI = os.environ['FLASK_SQLALCHEMY_DATABASE_URI']
+
+    if "FLASK_SQLALCHEMY_DATABASE_URI" in os.environ:
+        SQLALCHEMY_DATABASE_URI = os.environ["FLASK_SQLALCHEMY_DATABASE_URI"]
     else:
-        SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:5432/{}'.format(
-            os.getenv('DB_USER', 'root'),
-            os.getenv('DB_PASSWORD', 'password'),
-            os.getenv('DB_HOST', 'localhost'),
-            os.getenv('DB_NAME', 'smo')
+        SQLALCHEMY_DATABASE_URI = "postgresql://{}:{}@{}:5432/{}".format(
+            os.getenv("DB_USER", "root"),
+            os.getenv("DB_PASSWORD", "password"),
+            os.getenv("DB_HOST", "localhost"),
+            os.getenv("DB_NAME", "smo"),
         )
-    KARMADA_KUBECONFIG = '/home/python/.kube/{}'.format(
-        os.getenv('KARMADA_KUBECONFIG', 'karmada-apiserver.config')
+    KARMADA_KUBECONFIG = "/home/python/.kube/{}".format(
+        os.getenv("KARMADA_KUBECONFIG", "karmada-apiserver.config")
     )
-    SUBMARINER_KUBECONFIG = '/home/python/.kube/{}'.format(
-        os.getenv('SUBMARINER_KUBECONFIG', 'config')
+    SUBMARINER_KUBECONFIG = "/home/python/.kube/{}".format(
+        os.getenv("SUBMARINER_KUBECONFIG", "config")
     )
-    NFVCL_BASE_URL = os.getenv('NFVCL_BASE_URL')
-    INSECURE_REGISTRY = str_to_bool(os.getenv('INSECURE_REGISTRY'))
-    PROMETHEUS_HOST = os.getenv('PROMETHEUS_HOST')
-    SCALING_INTERVAL = os.getenv('SCALING_INTERVAL')
-    GRAFANA_HOST = os.getenv('GRAFANA_HOST')
-    GRAFANA_USERNAME = os.getenv('GRAFANA_USERNAME')
-    GRAFANA_PASSWORD = os.getenv('GRAFANA_PASSWORD')
-    SCALING_ENABLED = str_to_bool(os.getenv('SCALING_ENABLED'))
+    NFVCL_BASE_URL = os.getenv("NFVCL_BASE_URL")
+    INSECURE_REGISTRY = str_to_bool(os.getenv("INSECURE_REGISTRY"))
+    PROMETHEUS_HOST = os.getenv("PROMETHEUS_HOST")
+    SCALING_INTERVAL = os.getenv("SCALING_INTERVAL")
+    GRAFANA_HOST = os.getenv("GRAFANA_HOST")
+    GRAFANA_USERNAME = os.getenv("GRAFANA_USERNAME")
+    GRAFANA_PASSWORD = os.getenv("GRAFANA_PASSWORD")
+    SCALING_ENABLED = str_to_bool(os.getenv("SCALING_ENABLED"))
 
 
 class ProdConfig(Config):
     """Production settings."""
-    FLASK_ENV = 'production'
+
+    FLASK_ENV = "production"
     DEBUG = False
 
 
 class DevConfig(Config):
     """Development settings."""
-    FLASK_ENV = 'development'
+
+    FLASK_ENV = "development"
     DEBUG = True
 
 
 configs = {
-    'default': ProdConfig,
-    'production': ProdConfig,
-    'development': DevConfig,
+    "default": ProdConfig,
+    "production": ProdConfig,
+    "development": DevConfig,
 }

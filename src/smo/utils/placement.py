@@ -6,6 +6,7 @@ Provides functionalities to decide and manage the placement of services
 requirements, and optimization objectives. Includes an optimization-based
 solver using CVXPY and a simpler heuristic approach.
 """
+
 from typing import Any
 
 import cvxpy as cp
@@ -20,13 +21,14 @@ class PlacementError(ValueError):
     services onto clusters, such as insufficient capacity or unmet
     requirements.
     """
+
     pass
 
 
 def convert_placement(
     placement_matrix: list[list[int]],
     services_info: list[dict[str, Any]],
-    cluster_names: list[str]
+    cluster_names: list[str],
 ) -> dict[str, str]:
     """
     Converts a matrix-based placement to a service-to-cluster name mapping.
@@ -73,7 +75,7 @@ def convert_placement(
             msg = f"Service at index {service_idx} is not placed on any cluster according to the placement matrix."
             raise PlacementError(msg)
 
-        service_name = services_info[service_idx]['id']
+        service_name = services_info[service_idx]["id"]
         service_placement_map[service_name] = cluster_names[cluster_idx]
 
     return service_placement_map
@@ -131,10 +133,7 @@ def decide_placement(
     w_re = 1  # Re-optimization cost weight
 
     # Objective function
-    objective = cp.Minimize(
-        w_dep * cp.sum(x) +
-        w_re * cp.sum(cp.multiply(y, (y - x)))
-    )
+    objective = cp.Minimize(w_dep * cp.sum(x) + w_re * cp.sum(cp.multiply(y, (y - x))))
 
     constraints = []
 
@@ -146,8 +145,11 @@ def decide_placement(
     for e in range(num_clusters):
         constraints.append(
             cp.sum(
-                cp.multiply(x[:, e], [cpu_limits[s] * replicas[s] for s in range(num_nodes)])
-            ) <= cluster_capacities[e]
+                cp.multiply(
+                    x[:, e], [cpu_limits[s] * replicas[s] for s in range(num_nodes)]
+                )
+            )
+            <= cluster_capacities[e]
         )
 
     # Constraint 3: Acceleration feature constraints
@@ -167,7 +169,9 @@ def decide_placement(
     problem = cp.Problem(objective, constraints)
     problem.solve(solver=cp.HIGHS)
 
-    placement = [[int(x.value[s, e]) for e in range(num_clusters)] for s in range(num_nodes)]
+    placement = [
+        [int(x.value[s, e]) for e in range(num_clusters)] for s in range(num_nodes)
+    ]
     return placement
 
 
@@ -176,7 +180,7 @@ def calculate_naive_placement(
     cluster_acceleration_caps: list[float],
     cpu_limits: list[float],
     service_acceleration_reqs: list[float],
-    replicas: list[int]
+    replicas: list[int],
 ) -> list[list[int]]:
     """
     Calculates a feasible placement using a greedy first-fit heuristic.
@@ -219,10 +223,13 @@ def calculate_naive_placement(
 
     if max(service_reqs) > min(cluster_capacities):
         raise PlacementError(
-            'A single service cannot fit into any cluster. Increase cluster capacity or reduce service requirements.')
+            "A single service cannot fit into any cluster. Increase cluster capacity or reduce service requirements."
+        )
 
     if sum(service_reqs) > sum(cluster_capacities):
-        raise PlacementError('Insufficient total capacity to fit all services across the clusters.')
+        raise PlacementError(
+            "Insufficient total capacity to fit all services across the clusters."
+        )
 
     placement = [[0 for _ in range(num_clusters)] for _ in range(num_nodes)]
     cluster_usage = [0] * num_clusters
@@ -230,14 +237,17 @@ def calculate_naive_placement(
     for service_id, service_req in enumerate(service_reqs):
         placed = False
         for cluster_id, cluster_cap in enumerate(cluster_capacities):
-            if service_acceleration_reqs[service_id] <= cluster_acceleration_caps[cluster_id] and \
-                cluster_usage[cluster_id] + service_req <= cluster_cap:
+            if (
+                service_acceleration_reqs[service_id]
+                <= cluster_acceleration_caps[cluster_id]
+                and cluster_usage[cluster_id] + service_req <= cluster_cap
+            ):
                 placement[service_id][cluster_id] = 1
                 cluster_usage[cluster_id] += service_req
                 placed = True
                 break
         if not placed:
-            msg = f'Service {service_id} with requirement {service_req} could not be placed in any cluster.'
+            msg = f"Service {service_id} with requirement {service_req} could not be placed in any cluster."
             raise PlacementError(msg)
 
     return placement
@@ -268,4 +278,3 @@ def swap_placement(service_to_cluster: dict[str, str]) -> dict[str, list[str]]:
     for key, value in service_to_cluster.items():
         cluster_dict.setdefault(value, []).append(key)
     return cluster_dict
-

@@ -10,40 +10,71 @@ from utils.prometheus_helper import PrometheusHelper
 
 
 def scaling_loop(
-    graph_name, acceleration, alpha, beta, cluster_capacity, cluster_acceleration,
-    maximum_replicas, managed_services, decision_interval, config_file_path,
-    prometheus_host, stop_event
+    graph_name,
+    acceleration,
+    alpha,
+    beta,
+    cluster_capacity,
+    cluster_acceleration,
+    maximum_replicas,
+    managed_services,
+    decision_interval,
+    config_file_path,
+    prometheus_host,
+    stop_event,
 ):
     """Runs the scaling algorithm periodically."""
 
     karmada_helper = KarmadaHelper(config_file_path)
     prometheus_helper = PrometheusHelper(prometheus_host, decision_interval)
     while True:
-        previous_replicas = [karmada_helper.get_replicas(service) for service in managed_services]
+        previous_replicas = [
+            karmada_helper.get_replicas(service) for service in managed_services
+        ]
         if None in previous_replicas:
             time.sleep(5)
         else:
             break
 
-    previous_replicas = [karmada_helper.get_replicas(service) for service in managed_services]
+    previous_replicas = [
+        karmada_helper.get_replicas(service) for service in managed_services
+    ]
     cpu_limits = [karmada_helper.get_cpu_limit(service) for service in managed_services]
 
     while not stop_event.is_set():
         request_rates = []
         for service in managed_services:
-            if service == 'image-compression-vo':
-                request_rates.append(prometheus_helper.get_request_rate('noise-reduction'))
+            if service == "image-compression-vo":
+                request_rates.append(
+                    prometheus_helper.get_request_rate("noise-reduction")
+                )
             else:
                 request_rates.append(prometheus_helper.get_request_rate(service))
-        print(request_rates, previous_replicas, cpu_limits, acceleration, alpha,
-            beta, cluster_capacity, cluster_acceleration, maximum_replicas)
+        print(
+            request_rates,
+            previous_replicas,
+            cpu_limits,
+            acceleration,
+            alpha,
+            beta,
+            cluster_capacity,
+            cluster_acceleration,
+            maximum_replicas,
+        )
 
         new_replicas = decide_replicas(
-            request_rates, previous_replicas, cpu_limits, acceleration, alpha,
-            beta, cluster_capacity, cluster_acceleration, maximum_replicas
+            request_rates,
+            previous_replicas,
+            cpu_limits,
+            acceleration,
+            alpha,
+            beta,
+            cluster_capacity,
+            cluster_acceleration,
+            maximum_replicas,
         )
         if new_replicas is None:
-            requests.get(f'http://localhost:8000/graphs/{graph_name}/placement')
+            requests.get(f"http://localhost:8000/graphs/{graph_name}/placement")
         else:
             for idx, replicas in enumerate(new_replicas):
                 karmada_helper.scale_deployment(managed_services[idx], replicas)
@@ -54,8 +85,15 @@ def scaling_loop(
 
 
 def decide_replicas(
-    request_rates, previous_replicas, cpu_limits, acceleration, alpha, beta,
-    cluster_capacity, cluster_acceleration, maximum_replicas
+    request_rates,
+    previous_replicas,
+    cpu_limits,
+    acceleration,
+    alpha,
+    beta,
+    cluster_capacity,
+    cluster_acceleration,
+    maximum_replicas,
 ):
     """
     Parameters
@@ -79,8 +117,12 @@ def decide_replicas(
     num_nodes = len(previous_replicas)
 
     # Decision variables
-    r_current = [cp.Variable(integer=True, name=f"r_current_{s}") for s in range(num_nodes)]
-    abs_diff = [cp.Variable(nonneg=True, name=f"abs_diff_{s}") for s in range(num_nodes)]
+    r_current = [
+        cp.Variable(integer=True, name=f"r_current_{s}") for s in range(num_nodes)
+    ]
+    abs_diff = [
+        cp.Variable(nonneg=True, name=f"abs_diff_{s}") for s in range(num_nodes)
+    ]
 
     w_util = 0.4
     w_trans = 0.4
@@ -98,7 +140,8 @@ def decide_replicas(
 
     # Cluster CPU capacity constraint
     constraints.append(
-        cp.sum([cpu_limits[s] * r_current[s] for s in range(num_nodes)]) <= cluster_capacity
+        cp.sum([cpu_limits[s] * r_current[s] for s in range(num_nodes)])
+        <= cluster_capacity
     )
 
     # Per-node constraints
@@ -108,8 +151,11 @@ def decide_replicas(
         constraints.append(r_current[s] >= 1)
 
     objective = cp.Minimize(
-        w_util * cp.sum([r_current[s] * cpu_limits[s] / max_util_cost for s in range(num_nodes)]) +
-        w_trans * cp.sum([abs_diff[s] / max_trans_cost[s] for s in range(num_nodes)])
+        w_util
+        * cp.sum([
+            r_current[s] * cpu_limits[s] / max_util_cost for s in range(num_nodes)
+        ])
+        + w_trans * cp.sum([abs_diff[s] / max_trans_cost[s] for s in range(num_nodes)])
     )
 
     problem = cp.Problem(objective, constraints)

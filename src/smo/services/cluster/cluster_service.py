@@ -6,7 +6,13 @@ from utils.karmada_helper import KarmadaHelper
 from utils.submariner_helper import SubmarinerHelper
 
 
-def fetch_clusters(karmada_kubeconfig, submariner_kubeconfig, grafana_host, grafana_username, grafana_password):
+def fetch_clusters(
+    karmada_kubeconfig,
+    submariner_kubeconfig,
+    grafana_host,
+    grafana_username,
+    grafana_password,
+):
     """Retrieves all cluster data."""
 
     cluster_dict = []
@@ -17,27 +23,28 @@ def fetch_clusters(karmada_kubeconfig, submariner_kubeconfig, grafana_host, graf
     submariner_helper = SubmarinerHelper(submariner_kubeconfig)
     submariner_cluster_info = submariner_helper.get_cluster_info()
 
-
     for cluster_name, info in karmada_cluster_info.items():
         cluster = db.session.query(Cluster).filter(Cluster.name == cluster_name).first()
         if cluster is not None:
-            cluster.available_cpu = info['remaining_cpu']
-            cluster.available_ram = info['remaining_memory_bytes']
+            cluster.available_cpu = info["remaining_cpu"]
+            cluster.available_ram = info["remaining_memory_bytes"]
         else:
-            grafana_helper = GrafanaHelper(grafana_host, grafana_username, grafana_password)
+            grafana_helper = GrafanaHelper(
+                grafana_host, grafana_username, grafana_password
+            )
             dashboard = grafana_helper.create_cluster_dashboard(cluster_name)
             response = grafana_helper.publish_dashboard(dashboard)
-            grafana_url = f'{grafana_host}{response["url"]}'
+            grafana_url = f"{grafana_host}{response['url']}"
             cluster = Cluster(
                 name=cluster_name,
-                location='Unknown',
-                available_cpu=info['remaining_cpu'],
-                available_ram=info['remaining_memory_bytes'],
-                availability=info['availability'],
+                location="Unknown",
+                available_cpu=info["remaining_cpu"],
+                available_ram=info["remaining_memory_bytes"],
+                availability=info["availability"],
                 acceleration=0,
-                pod_cidr=submariner_cluster_info[cluster_name]['pod_cidr'],
-                service_cidr=submariner_cluster_info[cluster_name]['service_cidr'],
-                grafana=grafana_url
+                pod_cidr=submariner_cluster_info[cluster_name]["pod_cidr"],
+                service_cidr=submariner_cluster_info[cluster_name]["service_cidr"],
+                grafana=grafana_url,
             )
             db.session.add(cluster)
         db.session.commit()
