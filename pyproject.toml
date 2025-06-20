@@ -24,7 +24,6 @@ dependencies = [
     "flask>=3.1.0",
     "flask-sqlalchemy>=3.1.1",
     "kubernetes>=32.0.1",
-    "psycopg>=3.2.9",
     "psycopg2>=2.9.10",
     "psycopg2-binary>=2.9.9",
     "python-dotenv>=1.0.1",
@@ -58,6 +57,9 @@ dev = [
     "py-pglite[sqlalchemy]>=0.4.1",
     "flynt>=1.0.2",
     "abilian-devtools>=0.7.7",
+    "cyclonedx-bom>=6.1.1",
+    "lbom>=0.6",
+    "psycopg>=3.2.9",
 ]
 
 

@@ -31,17 +31,18 @@ Starting point = the orignal repository ([commit 6590688b51b6487da414b4d80598e57
 
 ### Roadmap / Started
 
-- [x] Refactor codebase for readability and maintainability.
-- [x] Integration tests with py-pglite
-- [ ] Add SQLite support for database flexibility.
-- [x] Implement static analysis and enforce consistent formatting.
-- [ ] Update documentation for usage and contribution guidelines (README)
-- [ ] Extend test capabilities to include runtime type-checking with tools like **Typeguard** and **Beartype**.
-- [ ] Add support for local development with **Vagrant**.
-- [ ] Implement a basic CLI for interacting with the SMO API.
-- [ ] Generate a SBOM for the project.
-- [ ] refact: Refactor using a layered architecture.
-- [ ] type: Add type hints to all functions and methods.
+- [x] Refact: Refactor codebase for readability and maintainability.
+- [x] Test: Integration tests with py-pglite
+- [x] Compliance: Add licencing check using REUSE
+- [x] Compliance: generate a SBOM
+- [ ] Feat: Add SQLite support for database flexibility.
+- [x] Implement static analysis (ruff) and enforce consistent formatting.
+- [ ] Doc: Update documentation for usage and contribution guidelines (README)
+- [ ] Test: Extend test capabilities to include runtime type-checking with tools like **Typeguard** and **Beartype**.
+- [x] DX: Add support for local development with **Vagrant**.
+- [ ] Feat: Implement a basic CLI for interacting with the SMO API.
+- [ ] Refact: Refactor using a layered architecture.
+- [ ] Type: Add type hints to all functions and methods.
 
 ### Roadmap / TODO
 
@@ -55,13 +56,9 @@ Starting point = the orignal repository ([commit 6590688b51b6487da414b4d80598e57
 - [ ] feature: Implement a proper configuration management.
 - [ ] feature: Implement a dependency injection mechanism.
 - [ ] feature: Implement an extension mechanism (e.g. `pluggy` or similar).
-- [ ] refact: Replace the Gurobi Optimizer with an [open-source alternative](https://lab.abilian.com/Tech/Programming%20Techniques/Optimization/)
-- [ ] lint: Fix / suppress all linting issues (ruff, flake8).
-- [ ] lint: Resolve all type-checking issues (mypy, pyright, typeguard, beartype).
-- [ ] doc: Introduce a Changelog (and tools to manage it, like `towncryer` or similar).
+- [ ] doc: Introduce a Changelog
 - [ ] doc: Create a proper documentation site using Portray or MkDocs (cf. <https://lab.abilian.com/Tech/Python/Tooling/Documentation/>)
 - [ ] doc: Describe python API using a formalized format (cf. <https://lab.abilian.com/Tech/Python/Tooling/Documenting%20a%20Python%20API/>)
-- [ ] chore: Add a license compliance report (and double-check REUSE config).
 
 ### Roadmap / Long-term
 

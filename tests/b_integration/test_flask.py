@@ -16,7 +16,7 @@ def test_app():
         port = url.port or 5432
         database = url.database
 
-        db_uri = f"postgresql+psycopg://{host}:{port}/{database}"
+        db_uri = f"postgresql+psycopg2://{host}:{port}/{database}"
 
         app = create_app(
             config={

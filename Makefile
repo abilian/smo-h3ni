@@ -61,3 +61,25 @@ push-code:
 	git push eclipse h3ni
 	git push gh h3ni
 	git push sourcehut h3ni
+
+
+## Generate Software Bill of Materials (SBOM) for CRA compliance
+generate-sbom:
+	@echo "--> Generating SBOM"
+	uv sync -q --no-dev
+	uv pip list --format=freeze > compliance/requirements-prod.txt
+	uv sync -q
+	# CycloneDX
+	uv run cyclonedx-py requirements \
+			--pyproject pyproject.toml -o compliance/sbom-cyclonedx.json \
+			compliance/requirements-prod.txt
+	# Add license information
+	uv run lbom \
+			--input_file compliance/sbom-cyclonedx.json \
+			> compliance/sbom-lbom.json
+	mv compliance/sbom-lbom.json compliance/sbom-cyclonedx.json
+	# broken
+	#       # SPDX
+	#       sbom4python -r compliance/requirements-prod.txt \
+	#               --sbom spdx --format json \
+	#               -o compliance/sbom-spdx.json
