@@ -28,7 +28,7 @@ def create_dashboard_variables(variable_name, possible_values):
 
     options = []
     for idx, value in enumerate(possible_values):
-        selected = True if idx == 0 else False
+        selected = idx == 0
         options.append({"selected": selected, "text": value, "value": value})
 
     query = ", ".join(possible_values)

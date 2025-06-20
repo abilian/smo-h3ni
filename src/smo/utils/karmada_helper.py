@@ -47,7 +47,7 @@ class KarmadaHelper:
                 ),
                 None,
             )
-            availability = True if status == "True" else False
+            availability = status == "True"
 
             result[cluster_name] = {
                 "total_cpu": float(total_cpu),
