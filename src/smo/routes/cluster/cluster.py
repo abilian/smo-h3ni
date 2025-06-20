@@ -1,9 +1,11 @@
 """Bare-metal Kubernetes cluster endpoints."""
 
+from __future__ import annotations
+
 from flasgger import swag_from
 from flask import Blueprint, current_app
 
-from services.cluster.cluster_service import fetch_clusters
+from smo.services.cluster.cluster_service import fetch_clusters
 
 cluster = Blueprint("cluster", __name__, url_prefix="/clusters")
 

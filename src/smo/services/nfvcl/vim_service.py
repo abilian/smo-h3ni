@@ -1,9 +1,11 @@
 """VIM business logic."""
 
+from __future__ import annotations
+
 import requests
 from werkzeug.exceptions import NotFound, BadRequest
 
-from models import db, VIM
+from smo.models import db, VIM
 
 
 def sync_vims(nfvcl_base_url):

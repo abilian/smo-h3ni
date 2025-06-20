@@ -1,9 +1,11 @@
 """Openstack cluster business logic."""
 
+from __future__ import annotations
+
 import requests
 from werkzeug.exceptions import InternalServerError, NotFound
 
-from models import db, VIM, OS_K8S_cluster
+from smo.models import db, VIM, OS_K8S_cluster
 
 
 def fetch_all_clusters():
@@ -98,9 +100,7 @@ def remove_cluster(nfvcl_base_url, smo_id):
             response.raise_for_status()  # Raise an exception for HTTP errors
             # Continue with the deletion of the OS_K8S_cluster
         except requests.exceptions.RequestException as e:
-            raise InternalServerError(
-                f"Failed to delete blueprint in NFVCL API: {str(e)}"
-            )
+            raise InternalServerError(f"Failed to delete blueprint in NFVCL API: {e!s}")
 
     # Remove the OS_K8S_cluster from the database
     db.session.delete(os_k8s_cluster)
@@ -218,31 +218,24 @@ def sync_nfvcl_k8s(blue_data):
             db.session.commit()
             added_nfvcl_k8s.append(k8s.as_dict())  # Include ID in the response
 
-        else:
-            # Check for changes in each field
-            if (
-                existing_blue.pop_area != blue["state"]["master_area"]["area_id"]
-                or existing_blue.master_flavor
-                != blue["create_config"]["master_flavors"]
-                or existing_blue.mgmt_network
-                != blue["state"]["master_area"]["mgmt_net"]
-                or existing_blue.service_network
-                != blue["state"]["master_area"]["service_net"]
-                or existing_blue.running_workers
-                != blue["state"]["progressive_worker_number"]
-            ):
-                # Update existing entry if any field has changed
-                existing_blue.pop_area = blue["state"]["master_area"]["area_id"]
-                existing_blue.master_flavor = blue["create_config"]["master_flavors"]
-                existing_blue.mgmt_network = blue["state"]["master_area"]["mgmt_net"]
-                existing_blue.service_network = blue["state"]["master_area"][
-                    "service_net"
-                ]
-                existing_blue.running_workers = blue["state"][
-                    "progressive_worker_number"
-                ]
-                updated_nfvcl_k8s.append(existing_blue.as_dict())
-                db.session.commit()
+        # Check for changes in each field
+        elif (
+            existing_blue.pop_area != blue["state"]["master_area"]["area_id"]
+            or existing_blue.master_flavor != blue["create_config"]["master_flavors"]
+            or existing_blue.mgmt_network != blue["state"]["master_area"]["mgmt_net"]
+            or existing_blue.service_network
+            != blue["state"]["master_area"]["service_net"]
+            or existing_blue.running_workers
+            != blue["state"]["progressive_worker_number"]
+        ):
+            # Update existing entry if any field has changed
+            existing_blue.pop_area = blue["state"]["master_area"]["area_id"]
+            existing_blue.master_flavor = blue["create_config"]["master_flavors"]
+            existing_blue.mgmt_network = blue["state"]["master_area"]["mgmt_net"]
+            existing_blue.service_network = blue["state"]["master_area"]["service_net"]
+            existing_blue.running_workers = blue["state"]["progressive_worker_number"]
+            updated_nfvcl_k8s.append(existing_blue.as_dict())
+            db.session.commit()
 
     return added_nfvcl_k8s, updated_nfvcl_k8s, existing_nfvcl_ids
 

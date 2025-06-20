@@ -1,10 +1,12 @@
 """Application graph endpoints."""
 
+from __future__ import annotations
+
 import yaml
 from flasgger import swag_from
 from flask import Blueprint, request
 
-from services.hdag.graph_service import (
+from smo.services.hdag.graph_service import (
     deploy_graph,
     fetch_graph,
     fetch_project_graphs,

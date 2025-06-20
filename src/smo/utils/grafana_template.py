@@ -1,5 +1,7 @@
 """Grafana template creator functions."""
 
+from __future__ import annotations
+
 
 def create_basic_dashboard(name):
     """Create a basic dashboard skeleton with no panels."""

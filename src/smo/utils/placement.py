@@ -7,6 +7,8 @@ requirements, and optimization objectives. Includes an optimization-based
 solver using CVXPY and a simpler heuristic approach.
 """
 
+from __future__ import annotations
+
 from typing import Any
 
 import cvxpy as cp
@@ -21,8 +23,6 @@ class PlacementError(ValueError):
     services onto clusters, such as insufficient capacity or unmet
     requirements.
     """
-
-    pass
 
 
 def convert_placement(
@@ -219,7 +219,7 @@ def calculate_naive_placement(
     num_clusters = len(cluster_capacities)
     num_nodes = len(cpu_limits)
 
-    service_reqs = [a * b for a, b in zip(replicas, cpu_limits)]
+    service_reqs = [a * b for a, b in zip(replicas, cpu_limits, strict=False)]
 
     if max(service_reqs) > min(cluster_capacities):
         raise PlacementError(

@@ -1,5 +1,7 @@
 """Application graph deployment business logic."""
 
+from __future__ import annotations
+
 import subprocess
 import tempfile
 import threading
@@ -9,18 +11,22 @@ import yaml
 from flask import current_app
 from werkzeug.exceptions import BadRequest, NotFound
 
-from models import db, Cluster, Graph, Service
-from utils.grafana_helper import GrafanaHelper
-from utils.karmada_helper import KarmadaHelper
-from utils.prometheus_helper import PrometheusHelper
-from utils.placement import (
+from smo.models import db, Cluster, Graph, Service
+from smo.utils.grafana_helper import GrafanaHelper
+from smo.utils.karmada_helper import KarmadaHelper
+from smo.utils.prometheus_helper import PrometheusHelper
+from smo.utils.placement import (
     convert_placement,
     decide_placement,
     swap_placement,
     calculate_naive_placement,
 )
-from utils.scaling import scaling_loop
-from utils.intent_translation import tranlsate_cpu, tranlsate_memory, tranlsate_storage
+from smo.utils.scaling import scaling_loop
+from smo.utils.intent_translation import (
+    tranlsate_cpu,
+    tranlsate_memory,
+    tranlsate_storage,
+)
 
 
 background_scaling_threads = {}
@@ -390,11 +396,11 @@ def get_descriptor_from_artifact(project, artifact_ref):
     with tempfile.TemporaryDirectory() as dirpath:
         # fmt: off
         subprocess.run([
-            'hdarctl',
-            'pull',
+            "hdarctl",
+            "pull",
             artifact_ref,
-            '--untar',
-            '--destination', dirpath
+            "--untar",
+            "--destination", dirpath
         ])
         # fmt: on
 
@@ -414,14 +420,14 @@ def helm_install_artifact(name, artifact_ref, values_overwrite, namespace, comma
 
         # fmt: off
         subprocess_arguments = [
-            'helm',
+            "helm",
             command,
             name,
             artifact_ref,
-            '--values', values_file.name,
-            '--namespace', namespace,
-            '--create-namespace',
-            '--kubeconfig', current_app.config['KARMADA_KUBECONFIG']
+            "--values", values_file.name,
+            "--namespace", namespace,
+            "--create-namespace",
+            "--kubeconfig", current_app.config["KARMADA_KUBECONFIG"]
         ]
         # fmt: on
 
@@ -443,11 +449,11 @@ def helm_uninstall_graph(services, namespace):
         if service.status == "Deployed":
             # fmt: off
             subprocess.run([
-                'helm',
-                'uninstall',
+                "helm",
+                "uninstall",
                 service.name,
-                '--namespace', namespace,
-                '--kubeconfig', current_app.config['KARMADA_KUBECONFIG']
+                "--namespace", namespace,
+                "--kubeconfig", current_app.config["KARMADA_KUBECONFIG"]
             ])
     # fmt: on
 

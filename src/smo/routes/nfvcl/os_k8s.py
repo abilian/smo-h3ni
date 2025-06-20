@@ -1,9 +1,11 @@
 """Openstack cluster endpoints."""
 
+from __future__ import annotations
+
 from flasgger import swag_from
 from flask import Blueprint, request, current_app
 
-from services.nfvcl.os_k8s_service import (
+from smo.services.nfvcl.os_k8s_service import (
     fetch_all_clusters,
     create_cluster,
     fetch_cluster,

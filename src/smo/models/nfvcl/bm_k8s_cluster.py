@@ -1,11 +1,13 @@
 """Bare-metal Kubernetes cluster."""
 
+from __future__ import annotations
+
 import random
 import string
 
 from sqlalchemy import event
 
-from models import db
+from smo.models import db
 
 
 class BM_K8S_cluster(db.Model):

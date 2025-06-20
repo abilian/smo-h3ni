@@ -1,9 +1,11 @@
 """Karmada helper class and utility functions."""
 
+from __future__ import annotations
+
 from kubernetes import client, config
 from kubernetes.utils import parse_quantity
 
-from utils.helpers import format_memory
+from smo.utils.helpers import format_memory
 
 
 class KarmadaHelper:

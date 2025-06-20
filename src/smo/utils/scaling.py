@@ -1,12 +1,14 @@
 """Replica scaling algorithm."""
 
+from __future__ import annotations
+
 import time
 
 import requests
 import cvxpy as cp
 
-from utils.karmada_helper import KarmadaHelper
-from utils.prometheus_helper import PrometheusHelper
+from smo.utils.karmada_helper import KarmadaHelper
+from smo.utils.prometheus_helper import PrometheusHelper
 
 
 def scaling_loop(

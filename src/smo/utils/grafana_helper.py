@@ -1,8 +1,9 @@
+from __future__ import annotations
 import requests
 from requests.auth import HTTPBasicAuth
 from werkzeug.exceptions import BadRequest
 
-from utils.grafana_template import (
+from smo.utils.grafana_template import (
     create_basic_dashboard,
     create_dashboard_variables,
     create_panels_cluster,

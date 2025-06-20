@@ -1,9 +1,11 @@
 """VIM endpoints."""
 
+from __future__ import annotations
+
 from flasgger import swag_from
 from flask import Blueprint, request, current_app
 
-from services.nfvcl.vim_service import (
+from smo.services.nfvcl.vim_service import (
     sync_vims,
     fetch_vim,
     remove_vim,

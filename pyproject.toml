@@ -17,13 +17,15 @@ classifiers = [
 ]
 license = "MIT"
 license-files = ["LICENSE"]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "cvxpy[highs]>=1.6.0",
     "flasgger>=0.9.7.1",
     "flask>=3.1.0",
     "flask-sqlalchemy>=3.1.1",
     "kubernetes>=32.0.1",
+    "psycopg>=3.2.9",
+    "psycopg2>=2.9.10",
     "psycopg2-binary>=2.9.9",
     "python-dotenv>=1.0.1",
     "pyyaml>=6.0.2",
@@ -53,6 +55,7 @@ dev = [
     "devtools>=0.12.2",
     "markdown-toc>=1.2.6",
     "coverage>=7.8.2",
+    "py-pglite[sqlalchemy]>=0.4.1",
 ]
 
 

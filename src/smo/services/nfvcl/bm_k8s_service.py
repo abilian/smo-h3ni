@@ -1,5 +1,7 @@
 """Bare-metal Kubernetes cluster business logic."""
 
+from __future__ import annotations
+
 import requests
 from werkzeug.exceptions import InternalServerError
 

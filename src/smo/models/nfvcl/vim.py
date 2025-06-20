@@ -1,6 +1,8 @@
 """Virtual Infrastructure Manager"""
 
-from models import db
+from __future__ import annotations
+
+from smo.models import db
 
 
 class VIM(db.Model):

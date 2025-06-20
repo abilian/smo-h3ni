@@ -1,9 +1,11 @@
 """Kubernetes cluster business logic."""
 
-from models import db, Cluster
-from utils.grafana_helper import GrafanaHelper
-from utils.karmada_helper import KarmadaHelper
-from utils.submariner_helper import SubmarinerHelper
+from __future__ import annotations
+
+from smo.models import db, Cluster
+from smo.utils.grafana_helper import GrafanaHelper
+from smo.utils.karmada_helper import KarmadaHelper
+from smo.utils.submariner_helper import SubmarinerHelper
 
 
 def fetch_clusters(

@@ -1,6 +1,8 @@
 """Application graph."""
 
-from models import db
+from __future__ import annotations
+
+from smo.models import db
 from sqlalchemy import JSON
 
 

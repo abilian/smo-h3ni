@@ -1,5 +1,7 @@
 """Helper functions"""
 
+from __future__ import annotations
+
 
 def format_memory(bytes_value):
     """Convert bytes to multiples."""
