@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from flasgger import swag_from
-from flask import Blueprint, request, current_app
+from flask import Blueprint, current_app, request
 
 from smo.services.nfvcl.os_k8s_service import (
-    fetch_all_clusters,
     create_cluster,
+    fetch_all_clusters,
     fetch_cluster,
     remove_cluster,
     scale_out_cluster,

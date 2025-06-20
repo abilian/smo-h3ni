@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from flasgger import swag_from
-from flask import Blueprint, request, current_app
+from flask import Blueprint, current_app, request
 
 from smo.services.nfvcl.vim_service import (
-    sync_vims,
+    create_vim,
+    fetch_all_vims,
     fetch_vim,
     remove_vim,
-    fetch_all_vims,
-    create_vim,
+    sync_vims,
 )
 
 vim = Blueprint("vim", __name__, url_prefix="/vims")

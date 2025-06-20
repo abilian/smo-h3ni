@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import requests
-from werkzeug.exceptions import NotFound, BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 
-from smo.models import db, VIM
+from smo.models import VIM, db
 
 
 def sync_vims(nfvcl_base_url):

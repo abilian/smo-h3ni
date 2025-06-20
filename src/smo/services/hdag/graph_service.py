@@ -11,23 +11,22 @@ import yaml
 from flask import current_app
 from werkzeug.exceptions import BadRequest, NotFound
 
-from smo.models import db, Cluster, Graph, Service
+from smo.models import Cluster, Graph, Service, db
 from smo.utils.grafana_helper import GrafanaHelper
-from smo.utils.karmada_helper import KarmadaHelper
-from smo.utils.prometheus_helper import PrometheusHelper
-from smo.utils.placement import (
-    convert_placement,
-    decide_placement,
-    swap_placement,
-    calculate_naive_placement,
-)
-from smo.utils.scaling import scaling_loop
 from smo.utils.intent_translation import (
     tranlsate_cpu,
     tranlsate_memory,
     tranlsate_storage,
 )
-
+from smo.utils.karmada_helper import KarmadaHelper
+from smo.utils.placement import (
+    calculate_naive_placement,
+    convert_placement,
+    decide_placement,
+    swap_placement,
+)
+from smo.utils.prometheus_helper import PrometheusHelper
+from smo.utils.scaling import scaling_loop
 
 background_scaling_threads = {}
 stop_events = {}
@@ -81,9 +80,11 @@ def deploy_graph(project, graph_descriptor):
         for service in services
     ]
     acceleration_list = [
-        1
-        if service["deployment"]["intent"]["compute"]["gpu"]["enabled"] == "True"
-        else 0
+        (
+            1
+            if service["deployment"]["intent"]["compute"]["gpu"]["enabled"] == "True"
+            else 0
+        )
         for service in services
     ]
     replicas = [1 for _ in services]

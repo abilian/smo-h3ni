@@ -7,15 +7,15 @@ from flasgger import swag_from
 from flask import Blueprint, request
 
 from smo.services.hdag.graph_service import (
+    deploy_conditional_service,
     deploy_graph,
     fetch_graph,
     fetch_project_graphs,
+    get_descriptor_from_artifact,
     remove_graph,
     start_graph,
     stop_graph,
     trigger_placement,
-    get_descriptor_from_artifact,
-    deploy_conditional_service,
 )
 
 graph = Blueprint("graph", __name__)

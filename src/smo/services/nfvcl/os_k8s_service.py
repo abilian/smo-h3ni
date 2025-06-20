@@ -5,7 +5,7 @@ from __future__ import annotations
 import requests
 from werkzeug.exceptions import InternalServerError, NotFound
 
-from smo.models import db, VIM, OS_K8S_cluster
+from smo.models import VIM, OS_K8S_cluster, db
 
 
 def fetch_all_clusters():

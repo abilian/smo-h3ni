@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from smo.models import db, Cluster
+from smo.models import Cluster, db
 from smo.utils.grafana_helper import GrafanaHelper
 from smo.utils.karmada_helper import KarmadaHelper
 from smo.utils.submariner_helper import SubmarinerHelper

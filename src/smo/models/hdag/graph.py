@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from smo.models import db
 from sqlalchemy import JSON
+
+from smo.models import db
 
 
 class Graph(db.Model):

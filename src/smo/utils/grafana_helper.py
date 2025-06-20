@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import requests
 from requests.auth import HTTPBasicAuth
 from werkzeug.exceptions import BadRequest

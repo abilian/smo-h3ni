@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import time
 
-import requests
 import cvxpy as cp
+import requests
 
 from smo.utils.karmada_helper import KarmadaHelper
 from smo.utils.prometheus_helper import PrometheusHelper

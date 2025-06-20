@@ -6,14 +6,14 @@ import os
 import subprocess
 
 import yaml
-from flask import Flask
 from flasgger import Swagger
+from flask import Flask
 
 from smo.config import configs
 from smo.errors import error_handlers
 from smo.models import db
-from smo.routes.hdag.graph import graph
 from smo.routes.cluster.cluster import cluster
+from smo.routes.hdag.graph import graph
 from smo.routes.nfvcl.os_k8s import os_k8s
 from smo.routes.nfvcl.vim import vim
 from smo.services.cluster.cluster_service import fetch_clusters
