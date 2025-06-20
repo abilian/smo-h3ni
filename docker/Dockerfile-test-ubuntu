@@ -1,0 +1,29 @@
+# This Dockerfile is used to test the SMO project in an Ubuntu environment.
+# It installs the necessary dependencies, runs tests, and performs linting.
+# We still need other dockerfiles for building a usable SMO.
+
+# FROM ubuntu:latest
+FROM ubuntu:25.04
+
+RUN apt-get update && \
+    apt-get install -y build-essential git-core npm python3-dev libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Fetch uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
+
+# Install dependencies and then the SMO project
+WORKDIR /app
+COPY pyproject.toml uv.lock /app/
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-install-project
+COPY . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
+
+# Run tests and linting
+RUN /usr/bin/npm --version
+RUN /usr/bin/node --version
+RUN uv run make test
+RUN uv run make lint
