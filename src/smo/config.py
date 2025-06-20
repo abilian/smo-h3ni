@@ -14,7 +14,7 @@ def str_to_bool(str_variable, default: bool | None = None) -> bool:  # noqa: FBT
         if default is not None:
             return default
         raise ValueError("str_variable cannot be None and no default provided")
-    return str_variable.lower() in ("t", "true")
+    return str_variable.lower() in {"t", "true"}
 
 
 class Config:

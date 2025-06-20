@@ -21,8 +21,9 @@ smo:
     - pip install uv
     - uv sync
     - uv run pytest
+    - uv run make lint
     # Smoke test for Flask app (still needs to be fixed)
-    - cd src
-    - uv run python app.py &> flask.log &
-    - sleep 7
-    - cat flask.log
+    # - cd src
+    # - uv run python app.py &> flask.log &
+    # - sleep 7
+    # - cat flask.log

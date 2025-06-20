@@ -137,8 +137,10 @@ def decide_replicas(
 
     # Absolute difference constraints
     for s in range(num_nodes):
-        constraints.append(abs_diff[s] >= previous_replicas[s] - r_current[s])
-        constraints.append(abs_diff[s] >= -(previous_replicas[s] - r_current[s]))
+        constraints += (
+            abs_diff[s] >= previous_replicas[s] - r_current[s],
+            abs_diff[s] >= -(previous_replicas[s] - r_current[s]),
+        )
 
     # Cluster CPU capacity constraint
     constraints.append(
@@ -148,9 +150,11 @@ def decide_replicas(
 
     # Per-node constraints
     for s in range(num_nodes):
-        constraints.append(acceleration[s] <= cluster_acceleration)
-        constraints.append(alpha[s] * r_current[s] + beta[s] >= request_rates[s])
-        constraints.append(r_current[s] >= 1)
+        constraints += (
+            acceleration[s] <= cluster_acceleration,
+            alpha[s] * r_current[s] + beta[s] >= request_rates[s],
+            r_current[s] >= 1,
+        )
 
     objective = cp.Minimize(
         w_util

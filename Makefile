@@ -1,5 +1,5 @@
 ## Default target is to run tests
-all: test
+all: test lint
 
 
 ## Help

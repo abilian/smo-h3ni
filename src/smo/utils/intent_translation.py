@@ -7,13 +7,13 @@ MEMORY_MAPPING = {"light": "500MiB", "small": "1GiB", "medium": "2GiB", "large":
 STORAGE_MAPPING = {"small": "10GB", "medium": "20GB", "large": "40GB"}
 
 
-def tranlsate_cpu(cpu_class):
+def translate_cpu(cpu_class):
     return CPU_MAPPING[cpu_class]
 
 
-def tranlsate_memory(memory_class):
+def translate_memory(memory_class):
     return MEMORY_MAPPING[memory_class]
 
 
-def tranlsate_storage(storage_class):
+def translate_storage(storage_class):
     return STORAGE_MAPPING[storage_class]

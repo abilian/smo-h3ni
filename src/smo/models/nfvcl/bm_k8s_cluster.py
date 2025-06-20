@@ -10,7 +10,7 @@ from sqlalchemy import event
 from smo.models import db
 
 
-class BM_K8S_cluster(db.Model):
+class BM_K8S_cluster(db.Model):  # noqa: N801
     __tablename__ = "bm_k8s_clusters"
 
     smo_id = db.Column(db.String(50), primary_key=True, unique=True, nullable=False)

@@ -14,9 +14,9 @@ from werkzeug.exceptions import BadRequest, NotFound
 from smo.models import Cluster, Graph, Service, db
 from smo.utils.grafana_helper import GrafanaHelper
 from smo.utils.intent_translation import (
-    tranlsate_cpu,
-    tranlsate_memory,
-    tranlsate_storage,
+    translate_cpu,
+    translate_memory,
+    translate_storage,
 )
 from smo.utils.karmada_helper import KarmadaHelper
 from smo.utils.placement import (
@@ -76,7 +76,7 @@ def deploy_graph(project, graph_descriptor):
 
     services = hdag_config["services"]
     cpu_limits = [
-        tranlsate_cpu(service["deployment"]["intent"]["compute"]["cpu"])
+        translate_cpu(service["deployment"]["intent"]["compute"]["cpu"])
         for service in services
     ]
     acceleration_list = [
@@ -143,9 +143,9 @@ def deploy_graph(project, graph_descriptor):
                 )
                 prom_helper.update_alert_rules(alert, "add")
 
-        cpu = tranlsate_cpu(service["deployment"]["intent"]["compute"]["cpu"])
-        memory = tranlsate_memory(service["deployment"]["intent"]["compute"]["ram"])
-        storage = tranlsate_storage(
+        cpu = translate_cpu(service["deployment"]["intent"]["compute"]["cpu"])
+        memory = translate_memory(service["deployment"]["intent"]["compute"]["ram"])
+        storage = translate_storage(
             service["deployment"]["intent"]["compute"]["storage"]
         )
         gpu = (

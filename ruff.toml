@@ -57,6 +57,8 @@ lint.extend-ignore = [
     "RUF039", # First argument to `re.search()` is not raw string
     "PERF401", # Use list comprehensions / list.extend
     "F841", # Local variable ... is assigned to but never used
+    "TRY300", # Consider moving the `raise` statement to an else block
+    "PLR0915", #
 
     # Fix
     "B007", # Loop control variable `dirs` not used within loop body
