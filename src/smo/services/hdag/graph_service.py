@@ -407,7 +407,7 @@ def get_descriptor_from_artifact(project, artifact_ref):
         for root, dirs, files in walk(dirpath):
             for file in files:
                 if file.endswith(".yaml") or file.endswith(".yml"):
-                    with open(path.join(root, file), "r") as yaml_file:
+                    with open(path.join(root, file)) as yaml_file:
                         data = yaml.safe_load(yaml_file)
                         return data
 

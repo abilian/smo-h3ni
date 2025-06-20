@@ -31,11 +31,9 @@ class Config:
             os.getenv("DB_HOST", "localhost"),
             os.getenv("DB_NAME", "smo"),
         )
-    KARMADA_KUBECONFIG = "/home/python/.kube/{}".format(
-        os.getenv("KARMADA_KUBECONFIG", "karmada-apiserver.config")
-    )
-    SUBMARINER_KUBECONFIG = "/home/python/.kube/{}".format(
-        os.getenv("SUBMARINER_KUBECONFIG", "config")
+    KARMADA_KUBECONFIG = f"/home/python/.kube/{os.getenv('KARMADA_KUBECONFIG', 'karmada-apiserver.config')}"
+    SUBMARINER_KUBECONFIG = (
+        f"/home/python/.kube/{os.getenv('SUBMARINER_KUBECONFIG', 'config')}"
     )
     NFVCL_BASE_URL = os.getenv("NFVCL_BASE_URL")
     INSECURE_REGISTRY = str_to_bool(os.getenv("INSECURE_REGISTRY"), default=False)
