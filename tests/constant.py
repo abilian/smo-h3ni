@@ -11,6 +11,7 @@ CLUSTER_CAPACITY = {"netmode-cluster": 4, "netmode-cluster2": 6}
 CLUSTER_CAPACITY_LIST = [value for value in CLUSTER_CAPACITY.values()]
 CLUSTER_ACCELERATION = {"netmode-cluster": 0, "netmode-cluster2": 0}
 CLUSTER_ACCELERATION_LIST = [value for value in CLUSTER_ACCELERATION.values()]
+
 # Info that comes from intent or after intent translation
 CPU_LIMITS = {"image-compression-vo": 0.5, "noise-reduction": 1, "image-detection": 1}
 CPU_LIMITS_LIST = [value for value in CPU_LIMITS.values()]
@@ -19,6 +20,10 @@ ACCELERATION_LIST = [value for value in ACCELERATION.values()]
 REPLICAS = {"image-compression-vo": 1, "noise-reduction": 1, "image-detection": 1}
 REPLICAS_LIST = [value for value in REPLICAS.values()]
 INITIAL_PLACEMENT = [[1, 0], [1, 0], [1, 0]]
+
+#
+# Not used
+#
 graph_placement = [[1, 0], [1, 0], [1, 0]]
 MAXIMUM_REPLICAS = {
     "image-compression-vo": 3,

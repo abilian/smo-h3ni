@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from smo.utils.placement import (convert_placement, decide_placement,
-                                 swap_placement)
+from smo.utils.placement import convert_placement, decide_placement, swap_placement
 from . import constant as c
 
 
