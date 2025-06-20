@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 
-from devtools import debug
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -21,7 +20,6 @@ def str_to_bool(str_variable, default: bool | None = None) -> bool:
 class Config:
     """Database connection credentials."""
 
-    debug(dict(**os.environ))
     if "FLASK_SQLALCHEMY_DATABASE_URI" in os.environ:
         SQLALCHEMY_DATABASE_URI = os.environ["FLASK_SQLALCHEMY_DATABASE_URI"]
     else:
