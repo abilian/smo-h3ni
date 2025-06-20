@@ -28,18 +28,18 @@ Starting point = the orignal repository ([commit 6590688b51b6487da414b4d80598e57
 - [x] Add basic unit tests for functionality validation.
 - [x] Create a CI pipeline on SourceHut.
 - [x] Introduce a `Makefile` to streamline hypermodern Python development workflows (e.g., testing, linting, formatting).
-
-### Roadmap / Started
-
 - [x] Refact: Refactor codebase for readability and maintainability.
 - [x] Test: Integration tests with py-pglite
 - [x] Compliance: Add licencing check using REUSE
 - [x] Compliance: generate a SBOM
-- [ ] Feat: Add SQLite support for database flexibility.
 - [x] Implement static analysis (ruff) and enforce consistent formatting.
+- [x] DX: Add support for local development with **Vagrant**.
+
+### Roadmap / Started
+
+- [ ] Feat: Add SQLite support for database flexibility.
 - [ ] Doc: Update documentation for usage and contribution guidelines (README)
 - [ ] Test: Extend test capabilities to include runtime type-checking with tools like **Typeguard** and **Beartype**.
-- [x] DX: Add support for local development with **Vagrant**.
 - [ ] Feat: Implement a basic CLI for interacting with the SMO API.
 - [ ] Refact: Refactor using a layered architecture.
 - [ ] Type: Add type hints to all functions and methods.
