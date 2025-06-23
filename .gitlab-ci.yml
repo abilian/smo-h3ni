@@ -16,7 +16,11 @@ smo:
       alias: postgres
 
   before_script:
-    - apt-get update -qq && apt-get install -y -qq npm
+    # - apt-get update -qq && apt-get install -y -qq npm
+    # Install nodejs 24.x
+    - curl -sL https://deb.nodesource.com/setup_24.x -o nodesource_setup.sh
+    - bash nodesource_setup.sh
+    - apt install nodejs
 
   script:
     - export PGPASSWORD=$POSTGRESQL_PASSWORD
