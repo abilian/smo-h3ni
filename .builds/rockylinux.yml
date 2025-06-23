@@ -15,7 +15,7 @@ packages:
   # Build tools
   - make
   - gcc
-  - npm
+  # - npm
   # Libraries
   - libpq-devel
   # Docker and friends (NB: docker is not available on Rocky Linux)
@@ -26,6 +26,11 @@ packages:
 
 tasks:
   - setup: |
+      # Install nodejs 24.x
+      curl -sL https://deb.nodesource.com/setup_24.x -o nodesource_setup.sh
+      sudo bash nodesource_setup.sh
+      sudo apt install nodejs
+      # Install python pre-requisites
       sudo pip3.12 install -U uv nox
       cd smo-h3ni
       uv sync

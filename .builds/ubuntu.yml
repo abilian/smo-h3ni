@@ -11,7 +11,7 @@ packages:
   - make
   - gcc
   - g++
-  - npm
+  #  - npm
   # Python (this is Python 3.12)
   - python3-dev
   - python3-pip
@@ -27,6 +27,11 @@ packages:
 
 tasks:
   - setup: |
+      # Install nodejs 24.x
+      curl -sL https://deb.nodesource.com/setup_24.x -o nodesource_setup.sh
+      sudo bash nodesource_setup.sh
+      sudo apt install nodejs
+      # Install python pre-requisites
       sudo pip install --break-system-packages -U uv nox
       cd smo-h3ni
       uv sync
