@@ -4,6 +4,15 @@ hdaGraph:
   version: "1.0.0"
   designer: Abilian
   description: A minimal "Hello World" application graph for SMO.
+  hdaGraphIntent:
+    security:
+      enabled: False
+    highAvailability:
+      enabled: False
+    highPerformance:
+      enabled: False
+    energyEfficiency:
+      enabled: False
   services:
     - id: hello-world
       deployment:
