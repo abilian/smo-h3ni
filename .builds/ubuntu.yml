@@ -28,6 +28,7 @@ packages:
 tasks:
   - setup: |
       # Install nodejs 24.x
+      # See: https://github.com/wey-gu/py-pglite/issues/22#issuecomment-2996124008
       curl -sL https://deb.nodesource.com/setup_24.x -o nodesource_setup.sh
       sudo bash nodesource_setup.sh
       sudo apt install nodejs
