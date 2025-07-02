@@ -10,6 +10,7 @@ TEST_GRAPH = json.dumps({
     "version": "1.0.0",
     "designer": "NTUA",
     "hdaGraphIntent": {
+      "useStaticPlacement": True,
       "security": {
         "enabled": False
       },
