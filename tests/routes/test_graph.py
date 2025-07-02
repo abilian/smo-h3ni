@@ -100,8 +100,7 @@ def test_graph_lifecycle(client):
         mock_install.return_value = None
         mock_uninstall.return_value = None
 
-        deploy_payload = {'hdaGraph': {'name': graph_name, 'description': 'test graph'}}
-        deploy_resp = client.post(f'/project/{project}/graphs', json=deploy_payload)
+        deploy_resp = client.post(f'/project/{project}/graphs', json=TEST_GRAPH)
         assert deploy_resp.status_code == 200
 
         fetch_resp = client.get(f'/graphs/{graph_name}')
