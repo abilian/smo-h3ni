@@ -16,6 +16,9 @@ class TestPrometheusHelper:
     def get_request_rate(self, name):
         return 10.0
 
+    def update_alert_rules(self, alert, action):
+        pass
+
 
 class TestGrafanaHelper:
     """Mock class for GrafanaHelper to simulate Grafana interactions in tests."""
@@ -110,9 +113,10 @@ def custom_env_app():
 
         with patch('utils.grafana_helper.GrafanaHelper', TestGrafanaHelper):
             with patch('utils.karmada_helper.KarmadaHelper', TestKarmadaHelper):
-                from app import create_app
-                app = create_app()
-                yield app
+                with patch('utils.prometheus_helper.PrometheusHelper', TestPrometheusHelper):
+                    from app import create_app
+                    app = create_app()
+                    yield app
 
 
 @pytest.fixture

@@ -58,9 +58,9 @@ TEST_GRAPH = json.dumps({
               "latencies": []
             },
             "compute": {
-              "cpu": "light",
-              "ram": "light",
-              "storage": "light",
+              "cpu": "small",
+              "ram": "small",
+              "storage": "small",
               "gpu": {
                 "enabled": False
               }
