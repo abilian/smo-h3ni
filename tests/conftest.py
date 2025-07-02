@@ -5,7 +5,21 @@ from pytest import MonkeyPatch
 from utils.helpers import format_memory
 
 
+class TestPrometheusHelper:
+    """Mock class for PrometheusHelper to simulate Prometheus interactions in tests."""
+
+    def __init__(self, prometheus_host, time_window='30', time_unit='s'):
+        self.prometheus_host = prometheus_host
+        self.time_window = time_window
+        self.time_unit = time_unit
+
+    def get_request_rate(self, name):
+        return 10.0
+
+
 class TestGrafanaHelper:
+    """Mock class for GrafanaHelper to simulate Grafana interactions in tests."""
+
     def __init__(self, *args, **kwargs):
         pass
 
@@ -23,6 +37,8 @@ class TestGrafanaHelper:
 
 
 class TestKarmadaHelper:
+    """Mock class for KarmadaHelper to simulate Karmada interactions in tests."""
+
     def __init__(self, config_file_path, namespace='default'):
         self.config_file_path = config_file_path
         self.namespace = namespace
@@ -73,6 +89,8 @@ class TestKarmadaHelper:
 
 @pytest.fixture
 def custom_env_app():
+    """Fixture to create a Flask app with custom environment variables for testing."""
+
     with MonkeyPatch.context() as mp:
         mp.setenv('FLASK_ENV', 'development')
         mp.setenv('KARMADA_KUBECONFIG', 'test-kube.config')
@@ -99,4 +117,6 @@ def custom_env_app():
 
 @pytest.fixture
 def client(custom_env_app):
+    """Fixture to create a test client for the Flask app."""
+
     return custom_env_app.test_client()

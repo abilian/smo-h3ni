@@ -1,4 +1,6 @@
 def test_get_clusters(client):
+    """Test retrieving a list of clusters."""
+
     response = client.get("/clusters/")
 
     assert response.status_code == 200
