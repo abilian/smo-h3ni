@@ -9,7 +9,21 @@ help:
 
 ## Default target to run tests
 test:
-	uv run pytest
+	make test-wo-db
+	make test-w-db
+
+test-wo-db:
+	uv run pytest tests/a_unit tests/b_integration
+
+
+test-w-db:
+	@echo "⏳ Starting Postgres with Docker Compose..."
+	COMPOSE_PROJECT_NAME=smo-tests docker compose -f docker-compose.test.yml up -d --wait
+	@echo "✅ Running pytest on $(TEST_PATH)..."
+	uv run pytest tests/c_e2e
+	@echo "🧹 Tearing down Docker Compose..."
+	COMPOSE_PROJECT_NAME=smo-tests docker compose -f docker-compose.test.yml down
+
 
 ## Test with Beartype
 test-beartype:

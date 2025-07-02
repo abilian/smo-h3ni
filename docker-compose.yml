@@ -1,5 +1,6 @@
 services:
   smo:
+    restart: always
     container_name: smo
     build: .
     env_file:
@@ -20,11 +21,16 @@ services:
       - 8000:8000
     extra_hosts:
     - "host.docker.internal:host-gateway"
+
   postgres:
+    restart: always
     container_name: postgres
     image: postgres:16.2
-    env_file:
-    - config/postgres.env
+    environment:
+      PGUSER: root
+      POSTGRES_DB: smo_test
+      POSTGRES_USER: smo_user
+      POSTGRES_PASSWORD: smo_pass
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -t 1"]
       interval: 3s

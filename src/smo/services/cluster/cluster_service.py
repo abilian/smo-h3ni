@@ -1,19 +1,12 @@
 """Kubernetes cluster business logic."""
 
-from __future__ import annotations
-
-from smo.models import Cluster, db
+from smo.models import db, Cluster
 from smo.utils.grafana_helper import GrafanaHelper
 from smo.utils.karmada_helper import KarmadaHelper
-from smo.utils.submariner_helper import SubmarinerHelper
 
 
 def fetch_clusters(
-    karmada_kubeconfig,
-    submariner_kubeconfig,
-    grafana_host,
-    grafana_username,
-    grafana_password,
+    karmada_kubeconfig, grafana_host, grafana_username, grafana_password
 ):
     """Retrieves all cluster data."""
 
@@ -21,9 +14,6 @@ def fetch_clusters(
 
     karmada_helper = KarmadaHelper(karmada_kubeconfig)
     karmada_cluster_info = karmada_helper.get_cluster_info()
-
-    submariner_helper = SubmarinerHelper(submariner_kubeconfig)
-    submariner_cluster_info = submariner_helper.get_cluster_info()
 
     for cluster_name, info in karmada_cluster_info.items():
         cluster = db.session.query(Cluster).filter(Cluster.name == cluster_name).first()
@@ -44,8 +34,6 @@ def fetch_clusters(
                 available_ram=info["remaining_memory_bytes"],
                 availability=info["availability"],
                 acceleration=0,
-                pod_cidr=submariner_cluster_info[cluster_name]["pod_cidr"],
-                service_cidr=submariner_cluster_info[cluster_name]["service_cidr"],
                 grafana=grafana_url,
             )
             db.session.add(cluster)

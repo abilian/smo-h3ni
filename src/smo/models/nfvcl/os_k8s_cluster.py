@@ -1,7 +1,5 @@
 """Openstack Kubernetes cluster."""
 
-from __future__ import annotations
-
 import random
 import string
 
@@ -10,7 +8,7 @@ from sqlalchemy import event
 from smo.models import db
 
 
-class OS_K8S_cluster(db.Model):  # noqa: N801
+class OS_K8S_cluster(db.Model):
     __tablename__ = "os_k8s_clusters"
 
     smo_id = db.Column(db.String(50), primary_key=True, unique=True, nullable=False)
@@ -24,7 +22,6 @@ class OS_K8S_cluster(db.Model):  # noqa: N801
     service_network = db.Column(db.String(100))
     running_workers = db.Column(db.Integer)
     karmada_details = db.Column(db.JSON)  # Something about Karmada
-    submariner_details = db.Column(db.JSON)  # Something about Submariner
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

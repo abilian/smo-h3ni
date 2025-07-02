@@ -1,7 +1,5 @@
 """Application graph deployment business logic."""
 
-from __future__ import annotations
-
 import subprocess
 import tempfile
 import threading
@@ -11,22 +9,23 @@ import yaml
 from flask import current_app
 from werkzeug.exceptions import BadRequest, NotFound
 
-from smo.models import Cluster, Graph, Service, db
+from smo.models import db, Cluster, Graph, Service
 from smo.utils.grafana_helper import GrafanaHelper
+from smo.utils.karmada_helper import KarmadaHelper
+from smo.utils.prometheus_helper import PrometheusHelper
+from smo.utils.placement import (
+    convert_placement,
+    decide_placement,
+    swap_placement,
+    calculate_naive_placement,
+)
+from smo.utils.scaling import scaling_loop
 from smo.utils.intent_translation import (
     translate_cpu,
     translate_memory,
     translate_storage,
 )
-from smo.utils.karmada_helper import KarmadaHelper
-from smo.utils.placement import (
-    calculate_naive_placement,
-    convert_placement,
-    decide_placement,
-    swap_placement,
-)
-from smo.utils.prometheus_helper import PrometheusHelper
-from smo.utils.scaling import scaling_loop
+
 
 background_scaling_threads = {}
 stop_events = {}
@@ -80,11 +79,9 @@ def deploy_graph(project, graph_descriptor):
         for service in services
     ]
     acceleration_list = [
-        (
-            1
-            if service["deployment"]["intent"]["compute"]["gpu"]["enabled"] == "True"
-            else 0
-        )
+        1
+        if service["deployment"]["intent"]["compute"]["gpu"]["enabled"] == "True"
+        else 0
         for service in services
     ]
     replicas = [1 for _ in services]
@@ -99,18 +96,21 @@ def deploy_graph(project, graph_descriptor):
     }
     cluster_capacity_list = [value for value in cluster_capacity.values()]
     cluster_acceleration_list = [value for value in cluster_acceleration.values()]
-    placement = calculate_naive_placement(
-        cluster_capacity_list,
-        cluster_acceleration_list,
-        cpu_limits,
-        acceleration_list,
-        replicas,
-    )
-    graph.placement = placement
 
-    service_placement = convert_placement(placement, services, cluster_list)
-    cluster_placement = swap_placement(service_placement)
-    import_clusters = create_service_imports(services, service_placement)
+    service_placement = {}
+    if not hdag_config["hdaGraphIntent"]["useStaticPlacement"]:
+        placement = calculate_naive_placement(
+            cluster_capacity_list,
+            cluster_acceleration_list,
+            cpu_limits,
+            acceleration_list,
+            replicas,
+        )
+        graph.placement = placement
+
+        service_placement = convert_placement(placement, services, cluster_list)
+        cluster_placement = swap_placement(service_placement)
+        import_clusters = create_service_imports(services, service_placement)
 
     svc_names = []
     for service in services:
@@ -154,13 +154,14 @@ def deploy_graph(project, graph_descriptor):
             else 0
         )
 
-        if implementer == "WOT":
-            if "voChartOverwrite" not in values_overwrite:
-                values_overwrite["voChartOverwrite"] = {}
-            placement_dict = values_overwrite["voChartOverwrite"]
+        if not hdag_config["hdaGraphIntent"]["useStaticPlacement"]:
+            if implementer == "WOT":
+                if "voChartOverwrite" not in values_overwrite:
+                    values_overwrite["voChartOverwrite"] = {}
+                placement_dict = values_overwrite["voChartOverwrite"]
 
-        placement_dict["clustersAffinity"] = [service_placement[name]]
-        placement_dict["serviceImportClusters"] = import_clusters[name]
+            placement_dict["clustersAffinity"] = [service_placement[name]]
+            placement_dict["serviceImportClusters"] = import_clusters[name]
 
         status = "Pending" if conditional_deployment else "Deployed"
 
@@ -168,12 +169,15 @@ def deploy_graph(project, graph_descriptor):
         response = grafana_helper.publish_dashboard(svc_dashboard)
         grafana_url = f"{current_app.config['GRAFANA_HOST']}{response['url']}"
 
+        cluster_affinity = (
+            service_placement[name] if name in service_placement else None
+        )
         svc = Service(
             name=name,
             values_overwrite=values_overwrite,
             graph_id=graph.id,
             status=status,
-            cluster_affinity=service_placement[name],
+            cluster_affinity=cluster_affinity,
             artifact_ref=artifact_ref,
             artifact_type=artifact_type,
             artifact_implementer=implementer,
@@ -257,7 +261,7 @@ def trigger_placement(name):
     import_clusters = create_service_imports(descriptor_services, service_placement)
 
     for service in graph.services:
-        # Updating JSON fields requires new dictionary creation
+        # Updating JSONB fields requires new dictionary creation
         values_overwrite = dict(service.values_overwrite)
         placement_dict = values_overwrite
         if service.artifact_implementer == "WOT":
@@ -333,8 +337,8 @@ def remove_graph(name):
         raise NotFound(f"Graph with name {name} not found")
 
     helm_uninstall_graph(graph.services, graph.project)
-    for stop_event in stop_events[name]:
-        stop_event.set()
+    # for stop_event in stop_events[name]:
+    #    stop_event.set()
 
     db.session.delete(graph)
     db.session.commit()
@@ -395,20 +399,19 @@ def get_descriptor_from_artifact(project, artifact_ref):
     """
 
     with tempfile.TemporaryDirectory() as dirpath:
-        # fmt: off
         subprocess.run([
             "hdarctl",
             "pull",
             artifact_ref,
             "--untar",
-            "--destination", dirpath
+            "--destination",
+            dirpath,
         ])
-        # fmt: on
 
         for root, dirs, files in walk(dirpath):
             for file in files:
                 if file.endswith(".yaml") or file.endswith(".yml"):
-                    with open(path.join(root, file)) as yaml_file:
+                    with open(path.join(root, file), "r") as yaml_file:
                         data = yaml.safe_load(yaml_file)
                         return data
 
@@ -419,19 +422,19 @@ def helm_install_artifact(name, artifact_ref, values_overwrite, namespace, comma
     with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml") as values_file:
         yaml.dump(values_overwrite, values_file)
 
-        # fmt: off
         subprocess_arguments = [
             "helm",
             command,
             name,
             artifact_ref,
-            "--values", values_file.name,
-            "--namespace", namespace,
+            "--values",
+            values_file.name,
+            "--namespace",
+            namespace,
             "--create-namespace",
-            "--kubeconfig", current_app.config["KARMADA_KUBECONFIG"]
+            "--kubeconfig",
+            current_app.config["KARMADA_KUBECONFIG"],
         ]
-        # fmt: on
-
         if current_app.config["INSECURE_REGISTRY"]:
             subprocess_arguments.append("--plain-http")
         if command == "upgrade":
@@ -446,17 +449,16 @@ def helm_uninstall_graph(services, namespace):
         if service.alert != {}:
             prom_helper = PrometheusHelper(current_app.config["PROMETHEUS_HOST"])
             prom_helper.update_alert_rules(service.alert, "remove")
-
         if service.status == "Deployed":
-            # fmt: off
             subprocess.run([
                 "helm",
                 "uninstall",
                 service.name,
-                "--namespace", namespace,
-                "--kubeconfig", current_app.config["KARMADA_KUBECONFIG"]
+                "--namespace",
+                namespace,
+                "--kubeconfig",
+                current_app.config["KARMADA_KUBECONFIG"],
             ])
-    # fmt: on
 
 
 def spawn_scaling_processes(graph_name, cluster_placement):

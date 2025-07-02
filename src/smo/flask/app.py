@@ -31,6 +31,7 @@ def create_app(app_name="smo", config=None):
     """Function that returns a configured Flask app."""
 
     app = Flask(app_name, root_path=ROOT_PATH)
+    app.config.from_prefixed_env()
     app.config.from_object(configs[env])
 
     # Override with any additional config passed

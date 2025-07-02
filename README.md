@@ -49,8 +49,8 @@ This repository hosts the Synergetic Meta-Orchestrator consisting of a Flask RES
 
 ## Prerequisites
 The following assumptions are made:
-- The Kubernetes cluster uses the containerd runtime as CRI
-- Karmada and Submariner have been installed to the cluster
+- The Kubernetes cluster uses the `containerd` runtime as CRI
+- Karmada has been installed to the cluster
 - The Prometheus CRDs need to be installed in the Karmada Control plane in order for the Service Monitors to work. If not installed,  either install them like this specifying the right version:
 ```bash
 # Define the Prometheus Operator version
@@ -79,10 +79,47 @@ kubectl create ns monitoring --kubeconfig $KUBECONFIG
 ```
 or delete all `servicemonitor.yaml` files from all the helmcharts.
 
+Make sure to copy the `/etc/karmada/karmada-apiserver.config` to the `~/.kube` directory with the correct permissions and ownership.
+
 ## Getting started
-The config files inside the `config` directory contain: the database credentials, the Karmada config and the NFVCL URL
+The config files inside the `config` directory contain:
+- `flask.env`:
+```sh
+# Database credentials. Must match the postgres.env credentials
+DB_USER='root'
+DB_PASSWORD='password'
+DB_HOST='postgres'
+DB_NAME='smo'
+
+# Filename of the Karmada API server configuration file located inside the ~/.kube directory
+KARMADA_KUBECONFIG='karmada-apiserver.config'
+# Base URL of the NVFCL API. Only applicable if the NFVCL API will be used
+NFVCL_BASE_URL='http://X.X.X.X'
+# Flag to set if container/artifact registry doesn't use HTTPS
+INSECURE_REGISTRY=True
+# URL of the Prometheus instance
+PROMETHEUS_HOST='http://X.X.X.X'
+# Interval in seconds that the scaling algorithm will run if enabled
+SCALING_INTERVAL=30
+# URL of the Grafana instance and credentials
+GRAFANA_HOST='http://X.X.X.X'
+GRAFANA_USERNAME='admin'
+GRAFANA_PASSWORD='prom-operator'
+# Boolean flag that enabled the scaling algorithm that runs periodically per cluster
+SCALING_ENABLED=False
+```
+- `postgres.env`:
+```sh
+# Database credentials. Must match the flask.env credentials
+PGUSER='root'
+POSTGRES_USER='root'
+POSTGRES_PASSWORD='password'
+POSTGRES_DB='smo'
+```
+
+Notes:
 - The database credentials can be set to whatever the user prefers but the credentials in the `flask.env` and `postgres.env` files must match
-- Regarding the Karmada config, the docker compose YAML mounts the `~/.kube` directory inside the container meaning that the SMO expects the karmada kubeconfig file to be inside that directory. Afterwards, the user can specify the name of the config file in the `KARMADA_KUBECONFIG` environment variable of the `config/flask.env` file.
+- Regarding the Karmada config, the docker compose YAML mounts the `~/.kube` directory inside the container meaning that the SMO expects the karmada kubeconfig file to be inside that directory.
 - The NVFCL URL is optional and only relevant if the NFVCL API is used
 - The `hdarctl` binary has to be available in the path. You can run for example:
     ```bash
@@ -90,6 +127,7 @@ The config files inside the `config` directory contain: the database credentials
     sudo chmod u+x hdarctl
     sudo mv hdarctl /usr/local/bin
     ```
+    When using the docker compose, the binary is automatically downloaded inside the container image.
 
 To deploy, use docker compose:
 ```bash
@@ -101,7 +139,9 @@ The SMO API is available by default at port 8000 and the Swagger API is accesibl
 While the Nephele platform works with a Hyper-Distributed Application Registry (HDAR), for testing purposes we can run a Distribution container/artifact registry. A docker compose file is located inside the `registry` directory:
 - Start up: `docker compose up -d`
 - Tear down: `docker compose down -v`
-The Distribution registry runs in port `5000` where container images and OCI artifacts can be pushed
+The Distribution registry runs in port `5000` where container images and OCI artifacts can be pushed.
+
+For the following sections, the `Host-IP` is considered to be any IP of a local interface where the SMO is deployed on.
 ### Docker container images
 #### Docker settings
 The registry can be used to host Docker images. For the container images to be accessible from Kubernetes, the images need to be tagged with the host's IP. Additionally the docker daemon has to be configured to communicate with the registry through HTTP. This can be done by adding:
@@ -181,6 +221,12 @@ src/
 - `utils`: misc
 - `app.py`: the Flask application
 - `config.py`: the Flask application configuration files
+
+## Tests
+To run the tests simply run:
+```bash
+make test
+```
 
 
 ## NFVCL API

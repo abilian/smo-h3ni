@@ -1,0 +1,20 @@
+services:
+  test-postgres:
+    image: postgres:16.2
+    ports:
+      - "65432:5432"
+    environment:
+      PGUSER: root
+      POSTGRES_USER: smo_user
+      POSTGRES_PASSWORD: smo_pass
+      POSTGRES_DB: smo
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -t 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test-network
+networks:
+  test-network:
+    driver: bridge
