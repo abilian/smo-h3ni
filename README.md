@@ -177,6 +177,12 @@ src/
 - `app.py`: the Flask application
 - `config.py`: the Flask application configuration files
 
+## Tests
+To run the tests simply run:
+```bash
+make test
+```
+
 
 ## NFVCL API
 To create a new Kubernetes Cluster using the NFVCL API using an Openstack-powered infrastructure:
