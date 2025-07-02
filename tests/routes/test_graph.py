@@ -1,7 +1,9 @@
+import json
+
 from unittest.mock import patch
 
 
-TEST_GRAPH = {
+TEST_GRAPH = json.dumps({
   "hdaGraph": {
     "imVersion": "0.4.0",
     "id": "test-graph",
@@ -85,7 +87,7 @@ TEST_GRAPH = {
       }
     ]
   }
-}
+})
 
 
 def test_graph_lifecycle(client):
